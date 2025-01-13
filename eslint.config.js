@@ -1,38 +1,74 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import react from 'eslint-plugin-react'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
+import globals from "globals";
+import js from "@eslint/js";
+import pluginReact from "eslint-plugin-react";
+import pluginReactHooks from "eslint-plugin-react-hooks";
+import pluginImport from "eslint-plugin-import";
 
+/** @type {import('eslint').Linter.Config[]} */
 export default [
-  { ignores: ['dist'] },
   {
-    files: ['**/*.{js,jsx}'],
+    files: ["**/*.{js,mjs,cjs,jsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals.es2024,
+      },
       parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: {
+          jsx: true,
+        },
       },
     },
-    settings: { react: { version: '18.3' } },
     plugins: {
-      react,
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
+      react: pluginReact,
+      "react-hooks": pluginReactHooks,
+      import: pluginImport,
+    },
+    settings: {
+      react: {
+        version: "detect",
+      },
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx"],
+        },
+      },
     },
     rules: {
+      // JavaScript recommended rules
       ...js.configs.recommended.rules,
-      ...react.configs.recommended.rules,
-      ...react.configs['jsx-runtime'].rules,
-      ...reactHooks.configs.recommended.rules,
-      'react/jsx-no-target-blank': 'off',
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+
+      // React recommended rules
+      ...pluginReact.configs.recommended.rules,
+
+      // Strict variable and import checking
+      "no-unused-vars": "error",
+      "no-undef": "error",
+      "no-use-before-define": "error",
+
+      // Import validation
+      "import/no-unresolved": "error",
+      "import/named": "error",
+      "import/namespace": "error",
+      "import/default": "error",
+      "import/export": "error",
+      "import/no-unused-modules": "error",
+
+      // React specific
+      "react/prop-types": "error",
+      "react/jsx-uses-vars": "error",
+      "react/jsx-uses-react": "error",
+
+      // Hooks rules
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+
+      // Additional best practices
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-console": "warn",
     },
   },
-]
+];
