@@ -1,15 +1,19 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 
 const Navbar = () => {
   return (
     <nav className="bg-red-500 p-4 flex justify-between items-center">
       <div className="flex items-center space-x-6">
-        <img src="/api/placeholder/40/40" alt="Logo" className="w-10 h-10 rounded-full" />
+        <Link to="/">
+          <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
+        </Link>
         <div className="hidden md:flex space-x-4 text-white">
-          <a href="#" className="hover:text-gray-200">Home</a>
-          <a href="#" className="hover:text-gray-200">Pencarian</a>
-          <a href="#" className="hover:text-gray-200">Blog</a>
-          <a href="#" className="hover:text-gray-200">Tentang Kami</a>
+          <Link to="/" className="hover:text-gray-200">Home</Link>
+          <Link to="/search-results" className="hover:text-gray-200">Pencarian</Link>
+          <Link to="/blog" className="hover:text-gray-200">Blog</Link>
+          <Link to="/about" className="hover:text-gray-200">Tentang Kami</Link>
         </div>
       </div>
       <div className="flex space-x-4">
