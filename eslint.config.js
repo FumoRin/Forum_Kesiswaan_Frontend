@@ -57,7 +57,7 @@ export default [
       "import/no-unused-modules": "error",
 
       // React specific
-      "react/prop-types": "error",
+      "react/prop-types": "off", // Disabled for now, might need to be re-enabled if wanted. Install proptype first before using.
       "react/jsx-uses-vars": "error",
       "react/jsx-uses-react": "error",
 
