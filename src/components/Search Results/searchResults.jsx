@@ -1,27 +1,33 @@
 import React, {useState, useEffect} from 'react';
 import SearchResultCard from './resultCard';
 
+
 const sampleResults = [
   {
-    school: "SMAN 1 Jakarta",
-    event: "Seminar Pendidikan",
-    date: "20 Januari 2025"
+    id: '1',
+    title: 'Lomba Kebersihan Antar Sekolah',
+    school: 'SMK Negeri 1 Cimahi',
+    event: 'Lomba WS Terbersih',
+    date: '16 Agustus 2024',
   },
   {
-    school: "SMAN 2 Jakarta",
-    event: "Seminar Teknologi",
-    date: "21 Januari 2025"
+    id: '2',
+    school: 'SMAN 2 Jakarta',
+    event: 'Seminar Teknologi',
+    date: '21 Januari 2025',
   },
   {
-    school: "SMAN 3 Jakarta",
-    event: "Seminar Ekonomi",
-    date: "22 Januari 2025"
+    id: '3',
+    school: 'SMAN 3 Jakarta',
+    event: 'Seminar Ekonomi',
+    date: '22 Januari 2025',
   },
   {
-    school: "SMAN 4 Jakarta",
-    event: "Seminar Politik",
-    date: "23 Januari 2025"
-  }
+    id: '4',
+    school: 'SMAN 4 Jakarta',
+    event: 'Seminar Politik',
+    date: '23 Januari 2025',
+  },
 ];
 
 //Set height based on screen
@@ -53,6 +59,7 @@ const SearchResults = () => {
         {sampleResults.map((result, index) => (
           <SearchResultCard
             key={index}
+            id={result.id}
             school={result.school}
             event={result.event}
             date={result.date}
