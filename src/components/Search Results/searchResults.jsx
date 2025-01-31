@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Search } from 'lucide-react'; // Import the Search icon
 import SearchResultCard from './resultCard';
 
 const sampleResults = [
@@ -53,10 +54,36 @@ const SearchResults = () => {
 
   return (
     <div className="mx-7 min-w-fit py-6" style={{ height: mainHeight }}>
-      <div className="p-2">
-        <h2 className="text-xl font-bold mb-4">
+      {/* Header Section with Title and Search/Filters */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        {/* Title */}
+        <h2 className="text-xl font-bold mb-4 md:mb-0">
           {sampleResults.length} Hasil Pencarian Ditemukan
         </h2>
+
+        {/* Search and Filters Section */}
+        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          {/* Search Input */}
+          <div className="relative w-full md:w-96">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full p-2 border rounded-lg pl-10 bg-gray-50"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+          </div>
+
+          {/* Filters */}
+          <select className="p-2 border rounded-lg bg-gray-50 text-gray-700 w-full md:w-auto">
+            <option>Tipe Acara</option>
+          </select>
+          <select className="p-2 border rounded-lg bg-gray-50 text-gray-700 w-full md:w-auto">
+            <option>Instansi</option>
+          </select>
+          <select className="p-2 border rounded-lg bg-gray-50 text-gray-700 w-full md:w-auto">
+            <option>Tanggal</option>
+          </select>
+        </div>
       </div>
 
       {/* Flex Container */}
