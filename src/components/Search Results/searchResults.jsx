@@ -1,6 +1,5 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchResultCard from './resultCard';
-
 
 const sampleResults = [
   {
@@ -28,9 +27,14 @@ const sampleResults = [
     event: 'Seminar Politik',
     date: '23 Januari 2025',
   },
+  {
+    id: '5',
+    school: 'SMAN 5 Jakarta',
+    event: 'Seminar Seni',
+    date: '24 Januari 2025',
+  },
 ];
 
-//Set height based on screen
 const SearchResults = () => {
   const [mainHeight, setMainHeight] = useState('100vh');
 
@@ -48,22 +52,24 @@ const SearchResults = () => {
   }, []);
 
   return (
-    <div className="mx-7 min-w-fit py-6" style={{height: mainHeight}}>
-      <div className='p-2'>
+    <div className="mx-7 min-w-fit py-6" style={{ height: mainHeight }}>
+      <div className="p-2">
         <h2 className="text-xl font-bold mb-4">
           {sampleResults.length} Hasil Pencarian Ditemukan
         </h2>
       </div>
-      
-      <div className="flex flex-row gap-5">
+
+      {/* Flex Container */}
+      <div className="flex flex-wrap justify-center gap-5">
         {sampleResults.map((result, index) => (
-          <SearchResultCard
-            key={index}
-            id={result.id}
-            school={result.school}
-            event={result.event}
-            date={result.date}
-          />
+          <div key={index} className="w-[450px]"> {/* Fixed width for cards */}
+            <SearchResultCard
+              id={result.id}
+              school={result.school}
+              event={result.event}
+              date={result.date}
+            />
+          </div>
         ))}
       </div>
     </div>
