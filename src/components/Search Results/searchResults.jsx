@@ -64,7 +64,7 @@ const SearchResults = () => {
   }, []);
 
   return (
-    <div className="mx-7 min-w-fit py-6" style={{ height: mainHeight }}>
+    <div className="mx-7 min-w-fit px-24 py-6" style={{ height: mainHeight }}>
       {/* Header Section with Title and Search/Filters */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         {/* Title */}
@@ -98,7 +98,7 @@ const SearchResults = () => {
       </div>
 
       {/* Results Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
         {sampleResults.map((result, index) => (
           <SearchResultCard
             key={index}
