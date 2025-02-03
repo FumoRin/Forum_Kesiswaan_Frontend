@@ -1,11 +1,13 @@
 import React from 'react';
 import { File, Building, Calendar } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import ImageGallery from 'react-image-gallery'
+import thumbnail from '../../assets/thumbnail.jpg';
+import 'react-image-gallery/styles/css/image-gallery.css';
 
 const BlogDetail = () => {
-  const { id } = useParams(); // Mengambil ID dari URL
+  const { id } = useParams();
 
-  // Contoh data dummy (ganti dengan fetch dari API atau context di implementasi nyata)
   const blogData = [
     {
       id: '1',
@@ -15,6 +17,26 @@ const BlogDetail = () => {
       date: '16 Agustus 2024',
       content:
         'Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah. Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi kebersihan, kerapihan, dan kreativitas dalam mendekorasi ruang belajar serta kamar mandi. Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.',
+      thumbnail: thumbnail,
+      gallery: [
+        {
+          original: 'https://picsum.photos/id/1018/800/600',
+          thumbnail: 'https://picsum.photos/id/1018/200/150',
+        },
+        {
+          original: 'https://picsum.photos/id/1025/800/600',
+          thumbnail: 'https://picsum.photos/id/1025/200/150',
+        },
+        {
+          original: 'https://picsum.photos/id/1035/800/600',
+          thumbnail: 'https://picsum.photos/id/1035/200/150',
+        },
+        {
+          original: 'https://picsum.photos/id/1040/800/600',
+          thumbnail: 'https://picsum.photos/id/1040/200/150',
+        },
+      ],
+    
     },
     {
       id: '2',
@@ -24,13 +46,12 @@ const BlogDetail = () => {
       date: '20 September 2024',
       content:
         'Pentas seni tahunan ini menjadi ajang untuk menampilkan kreativitas siswa melalui berbagai pertunjukan seni seperti musik, tari, drama, dan lainnya. Acara ini juga dihadiri oleh tamu undangan dari beberapa sekolah sekitar dan menjadi momen untuk mempererat hubungan antar sekolah.',
+      thumbnail: 'https://via.placeholder.com/150',
     },
   ];
 
-  // Cari data blog berdasarkan ID
   const blog = blogData.find((item) => item.id === id);
 
-  // Jika blog tidak ditemukan
   if (!blog) {
     return (
       <div className="p-4 text-center">
@@ -40,29 +61,89 @@ const BlogDetail = () => {
     );
   }
 
-  // Tampilan blog detail
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-        <h1 className="text-2xl font-bold text-blue-600 mb-4">{blog.title}</h1>
+    <div className="min-h-[calc(100vh-4rem)] p-6 bg-gray-50 w-full">
+      <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        {/* Main Content Area */}
+        <div className="p-8">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Text Content */}
+            <div className="flex-1 space-y-6">
+              <h1 className="text-3xl font-bold text-gray-800">{blog.title}</h1>
+              
+              <div className="flex flex-wrap gap-4 text-gray-600">
+                {/* Metadata Items */}
+                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+                  <Building className="w-5 h-5" />
+                  <span>{blog.school}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+                  <File className="w-5 h-5" />
+                  <span>{blog.event}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
+                  <Calendar className="w-5 h-5" />
+                  <span>{blog.date}</span>
+                </div>              
+              </div>
+            </div>
 
-        <div className="flex flex-col gap-4 mb-6">
-          <div className="flex items-center gap-2 text-gray-600">
-            <Building />
-            <span>{blog.school}</span>
+            {/* Thumbnail Image */}
+            <div className="w-full md:w-96 flex-shrink-0">
+              <div className="aspect-w-4 aspect-h-3 bg-gray-100 rounded-lg overflow-hidden">
+                <img
+                  src={blog.thumbnail}
+                  alt="Thumbnail"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <File />
-            <span>{blog.event}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600">
-            <Calendar />
-            <span>{blog.date}</span>
-          </div>
-        </div>
 
-        <div className="text-gray-800 leading-relaxed">
-          <p>{blog.content}</p>
+          {/* Blog Content */}
+          <div className="mt-8 prose max-w-none text-gray-700 leading-relaxed">
+            <p className="text-lg">{blog.content}</p>
+          </div>
+
+          {/* Gallery Section */}
+          {blog.gallery && blog.gallery.length > 0 && (
+            <div className="mt-12">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b-2 border-blue-100 pb-2">
+                Dokumentasi Acara
+              </h2>
+              
+              <div className="overflow-hidden rounded-lg border border-gray-200">
+                <ImageGallery
+                  items={blog.gallery}
+                  showPlayButton={false}
+                  showFullscreenButton={true}
+                  showThumbnails={true}
+                  thumbnailPosition="bottom"
+                  lazyLoad={true}
+                  slideInterval={3000}
+                  renderItem={(item) => (
+                    <div className="image-gallery-image aspect-video">
+                      <img
+                        src={item.original}
+                        alt=""
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  )}
+                  renderThumbInner={(item) => (
+                    <div className="aspect-square">
+                      <img
+                        src={item.thumbnail}
+                        alt=""
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  )}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
