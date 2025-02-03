@@ -2,10 +2,10 @@ import React from 'react';
 import { File, Building, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const SearchResultCard = ({ id, school, event, date }) => {
+const SearchResultCard = ({ title, id, school, event, date }) => {
   return (
     <Link to={`/blog/${id}`} className="block">
-      <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-100 hover:shadow-md hover:border-blue-200 transition">
+      <div className="p-6 bg-white rounded-lg shadow-sm border border-blue-100 hover:shadow-md hover:border-blue-200 transition h-full flex flex-col">
         <div className="flex gap-6">
           {/* Placeholder image container */}
           <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded">
@@ -25,8 +25,8 @@ const SearchResultCard = ({ id, school, event, date }) => {
           </div>
 
           {/* Content */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-xl font-medium text-blue-600">Title Card</h3>
+          <div className="flex flex-col gap-3 flex-1">
+            <h3 className="text-xl font-medium text-blue-600">{title}</h3>
             <div className="flex items-center gap-2 text-gray-600">
               <Building />
               <span>{school}</span>

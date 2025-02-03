@@ -12,28 +12,39 @@ const sampleResults = [
   },
   {
     id: '2',
-    school: 'SMAN 2 Jakarta',
-    event: 'Seminar Teknologi',
-    date: '21 Januari 2025',
+    title: 'Festival Seni Budaya Sekolah',
+    school: 'SMA Negeri 2 Bandung',
+    event: 'Festival Budaya',
+    date: '20 Agustus 2024',
   },
   {
     id: '3',
-    school: 'SMAN 3 Jakarta',
-    event: 'Seminar Ekonomi',
-    date: '22 Januari 2025',
+    title: 'Olimpiade Matematika Tingkat SMA',
+    school: 'SMA Negeri 3 Jakarta',
+    event: 'Olimpiade Matematika',
+    date: '25 Agustus 2024',
   },
   {
     id: '4',
-    school: 'SMAN 4 Jakarta',
-    event: 'Seminar Politik',
-    date: '23 Januari 2025',
+    title: 'Kompetisi Robotik Nasional',
+    school: 'SMK Negeri 4 Surabaya',
+    event: 'Kompetisi Robotik',
+    date: '1 September 2024',
   },
   {
     id: '5',
-    school: 'SMAN 5 Jakarta',
-    event: 'Seminar Seni',
-    date: '24 Januari 2025',
+    title: 'Turnamen Olahraga Antar SMA',
+    school: 'SMA Negeri 1 Yogyakarta',
+    event: 'Turnamen Olahraga',
+    date: '5 September 2024',
   },
+  {
+    id: '6',
+    title: 'Lomba Karya Tulis Ilmiah',
+    school: 'SMA Negeri 5 Malang',
+    event: 'LKTI Nasional',
+    date: '10 September 2024',
+  }
 ];
 
 const SearchResults = () => {
@@ -64,7 +75,7 @@ const SearchResults = () => {
         {/* Search and Filters Section */}
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           {/* Search Input */}
-          <div className="relative w-full md:w-96">
+          <div className="relative w-full md:w-64">
             <input
               type="text"
               placeholder="Search"
@@ -86,17 +97,17 @@ const SearchResults = () => {
         </div>
       </div>
 
-      {/* Flex Container */}
-      <div className="flex flex-wrap justify-center gap-5">
+      {/* Results Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sampleResults.map((result, index) => (
-          <div key={index} className="w-[450px]"> {/* Fixed width for cards */}
-            <SearchResultCard
-              id={result.id}
-              school={result.school}
-              event={result.event}
-              date={result.date}
-            />
-          </div>
+          <SearchResultCard
+            key={index}
+            title={result.title}
+            id={result.id}
+            school={result.school}
+            event={result.event}
+            date={result.date}
+          />
         ))}
       </div>
     </div>
