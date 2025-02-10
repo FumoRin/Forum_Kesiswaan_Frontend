@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react'; // Import the Search icon
 import SearchResultCard from './resultCard';
+import thumbnailBlog from "../../assets/thumbnail.jpg"
 
 const sampleResults = [
   {
@@ -9,6 +10,7 @@ const sampleResults = [
     school: 'SMK Negeri 1 Cimahi',
     event: 'Lomba WS Terbersih',
     date: '16 Agustus 2024',
+    thumbnail: thumbnailBlog,
   },
   {
     id: '2',
@@ -107,6 +109,7 @@ const SearchResults = () => {
             school={result.school}
             event={result.event}
             date={result.date}
+            thumbnail={result.thumbnail}
           />
         ))}
       </div>
