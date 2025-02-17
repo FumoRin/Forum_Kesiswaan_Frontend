@@ -17,8 +17,21 @@ const Navbar = () => {
         </div>
       </div>
       <div className="flex space-x-4">
-        <button className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100">Sign Up</button>
-        <button className="bg-transparent text-white border border-white px-4 py-2 rounded hover:bg-red-600">Login</button>
+        {/* Sign Up Button */}
+        <Link
+          to="/signup"
+          className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100 transition duration-300"
+        >
+          Sign Up
+        </Link>
+
+        {/* Login Button */}
+        <Link
+          to="/login"
+          className="bg-transparent text-white border border-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
+        >
+          Login
+        </Link>
       </div>
     </nav>
   );
