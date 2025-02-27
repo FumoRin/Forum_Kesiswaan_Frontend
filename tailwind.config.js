@@ -53,5 +53,18 @@ export default {
       },
     },
   },
-  plugins: [import("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }) {
+      const newUtilities = {
+        ".h-screen-navbar": {
+          height: "calc(100vh - var(--navbar-height))",
+        },
+        ".mt-navbar": {
+          marginTop: "var(--navbar-height)",
+        },
+      };
+      addUtilities(newUtilities);
+    },
+  ],
 };
