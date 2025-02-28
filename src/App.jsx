@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 import Footer from './components/footer';
 import SearchPage from './components/Search Page/searchPage';
-import SearchResults from './components/Search Results/searchResults';
+import SearchResults from './components/Search Results/SearchResults';
 import BlogDetail from './components/Blog Post/BlogDetail';
 import Login from './components/Auth/Login'; // Import komponen Login
 import SignUp from './components/Auth/SignUp'; // Import komponen SignUp
