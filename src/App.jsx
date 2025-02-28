@@ -3,6 +3,7 @@ import './App.css'
 
 import Homepage from './components/Home Page/homePage'
 import SearchResults from './components/Search Results/SearchResults'
+import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
 
@@ -15,6 +16,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Homepage />} />
             <Route path="/search-results" element={<SearchResults />} />
+            <Route path="/blog/:id" element={<BlogPage />} />
           </Route> 
         </Routes>
       </div>
