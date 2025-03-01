@@ -1,4 +1,6 @@
 import { LoginForm } from "@/components/login/login-form";
+import { SignupForm } from "./signup-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import authImage from "../../assets/auth-img.jpg";
 import appLogo from "../../assets/logo.svg";
 
@@ -19,7 +21,28 @@ export default function AuthPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm />
+            <Tabs
+              defaultValue="login"
+              className="flex flex-col min-h-[400px] relative"
+            >
+              {/* Add wrapper div with fixed height */}
+              <div className="h-[60px]">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">Login</TabsTrigger>
+                  <TabsTrigger value="register">Register</TabsTrigger>
+                </TabsList>
+              </div>
+
+              {/* Add padding-top to content area */}
+              <div className="flex-1 overflow-auto pt-2">
+                <TabsContent value="login" className="mt-0">
+                  <LoginForm />
+                </TabsContent>
+                <TabsContent value="register" className="mt-0">
+                  <SignupForm />
+                </TabsContent>
+              </div>
+            </Tabs>
           </div>
         </div>
       </div>
