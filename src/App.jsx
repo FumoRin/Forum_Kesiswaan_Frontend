@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom
 import './App.css'
 
 import Homepage from './components/Home Page/homePage'
+import AdminDashboard from "./components/Admin Dashboard/adminNavbar"
 import SearchResults from './components/Search Results/SearchResults'
 import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
@@ -28,6 +29,11 @@ function App() {
               </div>
             } />
           </Route>
+
+          {/* Admin Routes */}
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
         </Routes>
       </div>
     </Router>
@@ -50,5 +56,15 @@ const AuthLayout = () => (
     <Outlet />
   </>
 );
+
+const AdminLayout = () => (
+  <>
+    <Navbar />
+    <main className="flex-1">
+      <Outlet />
+    </main>
+    <Footer />
+  </>
+)
 
 export default App
