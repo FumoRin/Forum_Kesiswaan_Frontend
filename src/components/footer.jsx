@@ -16,10 +16,7 @@ const Footer = () => {
             <Link to="/about" className="text-gray-600 hover:text-gray-900">Tentang Kami</Link>
           </div>
           <div className="text-sm text-gray-500 flex flex-wrap justify-center gap-4">
-            <span>© 2024 Bclume. All rights reserved.</span>
-            <Link to="/privacy" className="text-gray-500 hover:text-gray-700">Privacy Policy</Link>
-            <Link to="/terms" className="text-gray-500 hover:text-gray-700">Terms of Service</Link>
-            <Link to="/cookies" className="text-gray-500 hover:text-gray-700">Cookies Settings</Link>
+            <span>© 2024 SIJA SMKN 1 Cimahi. All rights reserved.</span>
           </div>
         </div>
       </div>
