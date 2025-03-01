@@ -16,9 +16,9 @@ const Navbar = () => {
         </div>
       </div>
       <div className="flex space-x-4">
-        {/* Sign Up Button */}
-        <Link
-          to="/signup"
+      <Link
+          to="/auth"
+          state={{ tab: 'register' }}
           className="bg-white text-red-500 px-4 py-2 rounded hover:bg-gray-100 transition duration-300"
         >
           Sign Up
@@ -26,7 +26,8 @@ const Navbar = () => {
 
         {/* Login Button */}
         <Link
-          to="/login"
+          to="/auth"
+          state={{ tab: 'login' }}
           className="bg-transparent text-white border border-white px-4 py-2 rounded hover:bg-red-600 transition duration-300"
         >
           Login

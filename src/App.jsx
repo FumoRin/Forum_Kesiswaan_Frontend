@@ -22,7 +22,7 @@ function App() {
           
           {/* Auth Routes - without Navbar/Footer */}
           <Route element={<AuthLayout />}>
-            <Route path="/login" element={
+            <Route path="/auth" element={
               <div className="flex min-h-screen items-center justify-center">
                 <AuthPage />
               </div>
