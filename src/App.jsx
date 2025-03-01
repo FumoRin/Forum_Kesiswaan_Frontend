@@ -6,6 +6,7 @@ import SearchResults from './components/Search Results/SearchResults'
 import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
+import AuthPage from './components/login/page'
 
 function App() {
   return (
@@ -18,6 +19,15 @@ function App() {
             <Route path="/search-results" element={<SearchResults />} />
             <Route path="/blog/:id" element={<BlogPage />} />
           </Route> 
+          
+          {/* Auth Routes - without Navbar/Footer */}
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={
+              <div className="flex min-h-screen items-center justify-center">
+                <AuthPage />
+              </div>
+            } />
+          </Route>
         </Routes>
       </div>
     </Router>
@@ -35,10 +45,10 @@ const MainLayout = () => (
   </div>
 );
 
-// const AuthLayout = () => (
-//   <>
-//     <Footer />
-//   </>
-// );
+const AuthLayout = () => (
+  <>
+    <Outlet />
+  </>
+);
 
 export default App

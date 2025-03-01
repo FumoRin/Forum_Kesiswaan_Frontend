@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -89,8 +90,10 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full">
-          Lihat Detail
+        <Button variant="outline" className="w-full" asChild>
+          <Link to={`/blog/${id}`}>
+            Lihat Detail
+          </Link>
         </Button>
       </CardFooter>
     </Card>
