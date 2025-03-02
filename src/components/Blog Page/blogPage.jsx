@@ -73,7 +73,7 @@ const BlogPage = () => {
 
   if (!blog) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-6">
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-6 mt-navbar">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-center text-red-600">Blog tidak ditemukan</CardTitle>
@@ -93,7 +93,7 @@ const BlogPage = () => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 w-full" >
+    <div className=" p-6 bg-gray-50 w-full mt-navbar" >
       <div className="max-w-5xl mx-auto">
         <Button 
           variant="outline" 
