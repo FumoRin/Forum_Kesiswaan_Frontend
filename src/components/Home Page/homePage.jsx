@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import hero_bg from "../../assets/hero-bg.jpg";
+import bghome from "../../assets/bg-home.jpg";
 
 const Homepage = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -34,7 +34,7 @@ const Homepage = () => {
         <div
           className="absolute inset-0 z-0 transition-all duration-500"
           style={{
-            backgroundImage: `url(${hero_bg})`,
+            backgroundImage: `url(${bghome})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             transform: `scale(${1 + scrollY * 0.0005})`,
