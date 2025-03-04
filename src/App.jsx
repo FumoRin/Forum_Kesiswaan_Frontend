@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom
 import './App.css'
 
 import Homepage from './components/Home Page/homePage'
-import AdminDashboard from "./components/Admin Dashboard/adminNavbar"
-import SearchResults from './components/Search Results/SearchResults'
+import AdminDashboard from "./components/Admin Dashboard/AdminDashboard"
+import SearchResults from './components/Search Results/searchResults'
 import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  

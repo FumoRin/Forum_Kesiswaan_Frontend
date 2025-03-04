@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import react, { useState, useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, File, Building, Calendar } from "lucide-react";
 
 import thumbnailBlog from '../../assets/thumbnail.jpg' 
@@ -55,6 +56,13 @@ const sampleResults = [
 ];
 
 const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Card className="overflow-hidden">
       <div className="h-40 bg-gray-200 overflow-hidden">
@@ -71,30 +79,59 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
         )}
       </div>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
+        {isLoading ? (
+          <Skeleton className="h-6 w-[200px]" />
+        ) : (
+          <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
+        )}
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex flex-col space-y-1 text-sm">
           <p className="text-gray-700 flex items-center gap-2">
             <Building size={16} className="text-gray-500" />
-            <span className="font-medium">Sekolah:</span> {school}
+            { isLoading ? (
+              <Skeleton className="h-4 w-[100px]" />
+            ) : (
+              <>
+                <span className="font-medium">Sekolah:</span> {school}
+              </>
+            )}
           </p>
           <p className="text-gray-700 flex items-center gap-2">
             <File size={16} className="text-gray-500" />
-            <span className="font-medium">Acara:</span> {event}
+            { isLoading ? (
+              <Skeleton className="h-4 w-[100px]" />
+            ) : (
+              <>
+                <span className="font-medium">Acara:</span> {event}
+              </>
+            )}
           </p>
           <p className="text-gray-700 flex items-center gap-2">
             <Calendar size={16} className="text-gray-500" />
-            <span className="font-medium">Tanggal:</span> {date}
+            { isLoading ? (
+              <Skeleton className="h-4 w-[100px]" />
+            ) : (
+              <>
+              <span className="font-medium">Tanggal:</span> {date}
+              </>
+            )}
+            
           </p>
         </div>
       </CardContent>
       <CardFooter>
-        <Button variant="outline" className="w-full" asChild>
-          <Link to={`/blog/${id}`}>
-            Lihat Detail
-          </Link>
-        </Button>
+        {isLoading ? (
+          <Skeleton className="h-8 w-full" />
+          ) : (
+            <>
+              <Button variant="outline" className="w-full" asChild>
+                <Link to={`/blog/${id}`}>
+                  Lihat Detail
+                </Link>
+              </Button>
+            </>
+        )}
       </CardFooter>
     </Card>
   );
