@@ -8,6 +8,7 @@ import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
 import AuthPage from './components/login/page'
+import UserAdmin from "./components/Admin Dashboard/userAdmin"
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           {/* Admin Routes */}
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserAdmin />} />
           </Route>
         </Routes>
       </div>
@@ -44,7 +46,7 @@ function App() {
 const MainLayout = () => (
   <div className='flex flex-col min-h-screen'>
     <Navbar />
-    <main className="flex-1">
+    <main className="flex-1 mt-navbar">
       <Outlet />
     </main>
     <Footer />
@@ -60,7 +62,7 @@ const AuthLayout = () => (
 const AdminLayout = () => (
   <>
     <Navbar />
-    <main className="flex-1">
+    <main className="flex-1 py-4 px-8">
       <Outlet />
     </main>
     <Footer />

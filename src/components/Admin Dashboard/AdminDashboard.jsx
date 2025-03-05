@@ -34,7 +34,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="p-8 space-y-8 h-screen-navbar mt-navbar">
+    <div className="py-4 px-8 space-y-8 h-screen-navbar mt-navbar">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

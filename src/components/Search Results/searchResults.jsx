@@ -144,7 +144,7 @@ const SearchResults = () => {
   const [dateFilter, setDateFilter] = useState('');
 
   return (
-    <div className="w-full min-w-fit py-6 px-20 mt-navbar">
+    <div className="w-full min-w-fit py-6 px-20">
       {/* Search Results Header */}
       <div className="flex flex-col justify-between mb-6">
         <h2 className="text-3xl font-bold mb-4 md:mb-0"> 
