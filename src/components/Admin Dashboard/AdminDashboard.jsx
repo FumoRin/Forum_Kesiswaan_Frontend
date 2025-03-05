@@ -34,7 +34,7 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="py-4 px-8 space-y-8 h-screen-navbar mt-navbar">
+    <div className="space-y-8 h-screen-navbar mt-navbar">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -43,7 +43,7 @@ export default function AdminDashboard() {
         </BreadcrumbList>
       </Breadcrumb>
       
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold border-t">Admin Dashboard</h1>
       
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
