@@ -46,7 +46,7 @@ function App() {
 const MainLayout = () => (
   <div className='flex flex-col min-h-screen'>
     <Navbar />
-    <main className="flex-1 mt-navbar">
+    <main className="flex-1">
       <Outlet />
     </main>
     <Footer />
@@ -62,7 +62,7 @@ const AuthLayout = () => (
 const AdminLayout = () => (
   <>
     <Navbar />
-    <main className="flex-1 py-4 px-8">
+    <main className="flex-1 py-4 px-8 min-h-navbar">
       <Outlet />
     </main>
     <Footer />
