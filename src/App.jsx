@@ -8,7 +8,7 @@ import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
 import AuthPage from './components/login/page'
-import UserAdmin from "./components/Admin Dashboard/userAdmin"
+import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 
 function App() {
   return (
