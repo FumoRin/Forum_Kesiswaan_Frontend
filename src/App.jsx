@@ -62,7 +62,7 @@ const AuthLayout = () => (
 const AdminLayout = () => (
   <>
     <Navbar />
-    <main className="flex-1 py-4 px-8 min-h-navbar">
+    <main className="flex-1 py-4 px-8 ">
       <Outlet />
     </main>
     <Footer />

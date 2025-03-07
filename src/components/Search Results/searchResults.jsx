@@ -87,7 +87,7 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex flex-col space-y-1 text-sm">
-          <p className="text-gray-700 flex items-center gap-2">
+          <div className="text-gray-700 flex items-center gap-2">
             <Building size={16} className="text-gray-500" />
             { isLoading ? (
               <Skeleton className="h-4 w-[100px]" />
@@ -96,7 +96,7 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
                 <span className="font-medium">Sekolah:</span> {school}
               </>
             )}
-          </p>
+          </div>
           <p className="text-gray-700 flex items-center gap-2">
             <File size={16} className="text-gray-500" />
             { isLoading ? (
