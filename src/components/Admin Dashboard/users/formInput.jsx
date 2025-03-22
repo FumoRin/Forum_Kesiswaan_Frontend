@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { X } from "lucide-react";
-import UserFormInput from "./userAdmin"; // Import the component we created above
+import AddUserForm from "./addUser"; // Import the component we created above
 
 const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
   const [formData, setFormData] = useState(
@@ -61,20 +61,13 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" hideCloseButton={true}>
         <DialogHeader>
           <DialogTitle>{userData ? "Edit User" : "Add New User"}</DialogTitle>
-          <Button 
-            variant="ghost" 
-            className="absolute right-4 top-4 rounded-sm p-2" 
-            onClick={onClose}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <UserFormInput
+          <AddUserForm
             id="email"
             label="Email Address"
             type="email"
@@ -85,7 +78,7 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
             error={errors.email}
           />
           
-          <UserFormInput
+          <AddUserForm
             id="full_name"
             label="Full Name"
             placeholder="John Doe"
@@ -95,7 +88,7 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
             error={errors.full_name}
           />
           
-          <UserFormInput
+          <AddUserForm
             id="no_hp"
             label="Phone Number"
             placeholder="08123456789"
@@ -121,7 +114,7 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
             </select>
           </div>
           
-          <UserFormInput
+          <AddUserForm
             id="school"
             label="School"
             placeholder="High School Name"

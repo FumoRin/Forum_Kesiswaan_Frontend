@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,8 +12,9 @@ import { Button } from "@/components/ui/button";
 
 import { columns } from "./tables/column";
 import { DataTable } from "./tables/data-tables";
-
 import { UserPlus } from "lucide-react"; 
+
+import UserForm from "./formInput";
 
 
 
@@ -131,6 +134,43 @@ const dummyData = [
 ];
 
 export default function UserAdmin() {
+  const [users, setUsers] = useState(dummyData);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const handleAddUser = () => {
+    setCurrentUser(null); // Reset current user for adding new
+    setIsFormOpen(true);
+  };
+
+  const handleEditUser = (userData) => {
+    setCurrentUser(userData);
+    setIsFormOpen(true);
+  };
+
+  const handleFormSubmit = (userData) => {
+    if (currentUser) {
+      // Editing existing user
+      setUsers(users.map(user => 
+        user.id === currentUser.id ? { ...userData, id: user.id, updated_at: new Date().toISOString() } : user
+      ));
+    } else {
+      // Adding new user
+      const newUser = {
+        ...userData,
+        id: (Math.max(...users.map(user => parseInt(user.id))) + 1).toString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      setUsers([...users, newUser]);
+    }
+  };
+
+  // Add a function to handle user deletion if needed
+  const handleDeleteUser = (userId) => {
+    setUsers(users.filter(user => user.id !== userId));
+  };
+
   return (
     <div className="flex mt-navbar flex-col">
       <Breadcrumb>
@@ -153,16 +193,27 @@ export default function UserAdmin() {
             <h1 className="text-2xl font-bold">Users</h1>
             <p className="text-muted-foreground">Manage your users here.</p>
           </div>
-          <Button className="flex items-center gap-2">
+          <Button className="flex items-center gap-2" onClick={handleAddUser}>
             <UserPlus className="h-4 w-4" />
             Add New User
           </Button>
         </div>
 
         <div className="py-6">
-          <DataTable columns={columns} data={dummyData} />
+          <DataTable 
+            columns={columns} 
+            data={users} 
+            onEdit={handleEditUser} 
+            onDelete={handleDeleteUser} 
+          />
         </div>
       </div>
+      <UserForm 
+        isOpen={isFormOpen} 
+        onClose={() => setIsFormOpen(false)} 
+        userData={currentUser}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 }
