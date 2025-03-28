@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { X } from "lucide-react";
-import AddUserForm from "./addUser"; // Import the component we created above
+import AddUserForm from "./user-crud/addUser"; // Import the component we created above
 
 const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
   const [formData, setFormData] = useState(

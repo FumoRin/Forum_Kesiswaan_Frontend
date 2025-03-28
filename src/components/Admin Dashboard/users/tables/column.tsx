@@ -25,7 +25,10 @@ export type User = {
   updated_at: string;
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns = (
+  onEdit: (user: User) => void,
+  onDelete: (userId: string) => void
+): ColumnDef<User>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -133,9 +136,29 @@ export const columns: ColumnDef<User>[] = [
               Copy User ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Details</DropdownMenuItem>
-            <DropdownMenuItem>Edit User</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                onEdit(user);
+              }}
+            >
+              View Details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                onEdit(user);
+              }}
+            >
+              Edit User
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-red-600"
+              onSelect={(e) => {
+                e.preventDefault();
+                onDelete(user.id);
+              }}
+            >
               Delete User
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -15,9 +15,7 @@ import { DataTable } from "./tables/data-tables";
 import { UserPlus } from "lucide-react"; 
 
 import UserForm from "./formInput";
-
-
-
+import DeleteUserDialog from "./user-crud/deleteUser"; // New import
 
 const dummyData = [
   // Original entries
@@ -136,16 +134,32 @@ const dummyData = [
 export default function UserAdmin() {
   const [users, setUsers] = useState(dummyData);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const handleAddUser = () => {
-    setCurrentUser(null); // Reset current user for adding new
+    setCurrentUser(null);
     setIsFormOpen(true);
   };
 
   const handleEditUser = (userData) => {
     setCurrentUser(userData);
     setIsFormOpen(true);
+  };
+
+  const handleDeleteUser = (userId) => {
+    const userToDelete = users.find(user => user.id === userId);
+    setUserToDelete(userToDelete);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteUser = () => {
+    if (userToDelete) {
+      setUsers(users.filter(user => user.id !== userToDelete.id));
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
   };
 
   const handleFormSubmit = (userData) => {
@@ -164,11 +178,6 @@ export default function UserAdmin() {
       };
       setUsers([...users, newUser]);
     }
-  };
-
-  // Add a function to handle user deletion if needed
-  const handleDeleteUser = (userId) => {
-    setUsers(users.filter(user => user.id !== userId));
   };
 
   return (
@@ -201,18 +210,29 @@ export default function UserAdmin() {
 
         <div className="py-6">
           <DataTable 
-            columns={columns} 
+            columns={columns(handleEditUser, handleDeleteUser)} 
             data={users} 
-            onEdit={handleEditUser} 
-            onDelete={handleDeleteUser} 
           />
         </div>
       </div>
+
+      {/* User Form Dialog */}
       <UserForm 
         isOpen={isFormOpen} 
         onClose={() => setIsFormOpen(false)} 
         userData={currentUser}
         onSubmit={handleFormSubmit}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteUserDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setUserToDelete(null);
+        }}
+        onConfirmDelete={confirmDeleteUser}
+        userName={userToDelete?.full_name}
       />
     </div>
   );
