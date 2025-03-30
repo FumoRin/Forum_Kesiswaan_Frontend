@@ -9,6 +9,7 @@ import Navbar from './components/navbar'
 import Footer from './components/footer'  
 import AuthPage from './components/login/page'
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
+import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route element={<AdminLayout />}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserAdmin />} />
+            <Route path="/admin/blogs" element={<BlogAdmin />} />
           </Route>
         </Routes>
       </div>

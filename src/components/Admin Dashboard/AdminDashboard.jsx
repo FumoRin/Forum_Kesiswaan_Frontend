@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       total_Change: "21", 
       icon: <FileText className="h-4 w-4" />, 
       change: "+4.1%",
-      path: "/admin/blog-posts" 
+      path: "/admin/blogs" 
     },
   ];
 
@@ -137,7 +137,7 @@ export default function AdminDashboard() {
               {!isLoading && (
                 <Button
                   variant="outline"
-                  onClick={() => handleNavigation('/admin/blog-posts')}
+                  onClick={() => handleNavigation('/admin/blogs')}
                 >
                   View All Posts <ExternalLink className="ml-2 h-4 w-4" />
                 </Button>
