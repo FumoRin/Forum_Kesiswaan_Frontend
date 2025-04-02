@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,24 +9,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Skeleton } from '@/components/ui/skeleton';
-import { Search, File, Building, Calendar, Edit, Trash2, Plus } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Search, File, Building, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import BlogCard from "./blogCard";
+import BlogForm from "./blogs-crud/blogForm";
 import thumbnailBlog from "../../../assets/thumbnail.jpg";
 
+// Sample data
 const sampleResults = [
   {
     id: '1',
@@ -76,252 +73,41 @@ const sampleResults = [
   },
 ];
 
-const BlogCard = ({ blog, onEdit, onDelete }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const { id, title, school, event, date, status, thumbnail } = blog;
-
-  useEffect(() => {
-    // Simulate loading for demo purposes
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const statusColor = status === 'published'
-    ? 'bg-green-100 text-green-800'
-    : 'bg-yellow-100 text-yellow-800';
-
-  return (
-    <Card className="overflow-hidden">
-      <div className="h-40 bg-gray-200 overflow-hidden relative">
-        {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <p className="text-gray-400">No image</p>
-          </div>
-        )}
-        <div className="absolute top-2 right-2">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}>
-            {status === 'published' ? 'Published' : 'Draft'}
-          </span>
-        </div>
-      </div>
-      <CardHeader className="pb-2">
-        {isLoading ? (
-          <Skeleton className="h-6 w-[200px]" />
-        ) : (
-          <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
-        )}
-      </CardHeader>
-      <CardContent className="pb-2">
-        <div className="flex flex-col space-y-1 text-sm">
-          <div className="text-gray-700 flex items-center gap-2">
-            <Building size={16} className="text-gray-500" />
-            {isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Sekolah:</span> {school}
-              </>
-            )}
-          </div>
-          <p className="text-gray-700 flex items-center gap-2">
-            <File size={16} className="text-gray-500" />
-            {isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Acara:</span> {event}
-              </>
-            )}
-          </p>
-          <p className="text-gray-700 flex items-center gap-2">
-            <Calendar size={16} className="text-gray-500" />
-            {isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Tanggal:</span> {date}
-              </>
-            )}
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="flex gap-2">
-        {isLoading ? (
-          <Skeleton className="h-8 w-full" />
-        ) : (
-          <>
-            <Button variant="outline" size="sm" className="flex-1" onClick={() => onEdit(blog)}>
-              <Edit size={16} className="mr-2" /> Edit
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1 text-red-500 hover:text-red-700" onClick={() => onDelete(id)}>
-              <Trash2 size={16} className="mr-2" /> Delete
-            </Button>
-          </>
-        )}
-      </CardFooter>
-    </Card>
-  );
-};
-
-const BlogForm = ({ blog, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    id: blog?.id || '',
-    title: blog?.title || '',
-    school: blog?.school || '',
-    event: blog?.event || '',
-    date: blog?.date || '',
-    content: blog?.content || '',
-    status: blog?.status || 'draft',
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSelectChange = (name, value) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
-        <Input
-          id="title"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          placeholder="Enter blog title"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="school">School</Label>
-        <Input
-          id="school"
-          name="school"
-          value={formData.school}
-          onChange={handleChange}
-          placeholder="Enter school name"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="event">Event</Label>
-        <Input
-          id="event"
-          name="event"
-          value={formData.event}
-          onChange={handleChange}
-          placeholder="Enter event name"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="date">Date</Label>
-        <Input
-          id="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          placeholder="DD Bulan YYYY"
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="content">Content</Label>
-        <Textarea
-          id="content"
-          name="content"
-          value={formData.content}
-          onChange={handleChange}
-          placeholder="Enter blog content"
-          rows={5}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <Select
-          value={formData.status}
-          onValueChange={(value) => handleSelectChange('status', value)}
-        >
-          <SelectTrigger id="status">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button type="submit">Save</Button>
-      </DialogFooter>
-    </form>
-  );
-};
-
 export default function BlogAdmin() {
   const [blogs, setBlogs] = useState(sampleResults);
   const [searchQuery, setSearchQuery] = useState('');
   const [eventType, setEventType] = useState('');
   const [institution, setInstitution] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentBlog, setCurrentBlog] = useState(null);
   const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
-
+  
   const [activeTab, setActiveTab] = useState('all');
 
   // Filter blogs based on search and filters
   const filteredBlogs = blogs.filter(blog => {
     // Search query filter
     const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.school.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      blog.event.toLowerCase().includes(searchQuery.toLowerCase());
-
+                         blog.school.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         blog.event.toLowerCase().includes(searchQuery.toLowerCase());
+    
     // Event type filter
     const matchesEvent = !eventType || eventType === 'all' || blog.event.toLowerCase().includes(eventType.toLowerCase());
-
+    
     // Institution filter
     const matchesInstitution = !institution || institution === 'all' || blog.school.toLowerCase().includes(institution.toLowerCase());
-
-    // Date filter (simplified for demo)
-    const matchesDate = !dateFilter || dateFilter === 'all';
-
+    
     // Status filter
     const matchesStatus = !statusFilter || statusFilter === 'all' || blog.status === statusFilter;
-
+    
     // Tab filter
-    const matchesTab = activeTab === 'all' ||
-      (activeTab === 'published' && blog.status === 'published') ||
-      (activeTab === 'draft' && blog.status === 'draft');
-
-    return matchesSearch && matchesEvent && matchesInstitution && matchesDate && matchesStatus && matchesTab;
+    const matchesTab = activeTab === 'all' || 
+                      (activeTab === 'published' && blog.status === 'published') ||
+                      (activeTab === 'draft' && blog.status === 'draft');
+    
+    return matchesSearch && matchesEvent && matchesInstitution && matchesStatus && matchesTab;
   });
 
   const handleAddBlog = () => {
@@ -447,7 +233,7 @@ export default function BlogAdmin() {
             </Select>
           </div>
         </div>
-
+        
         {/* Results stats */}
         <div className="mb-4">
           <p className="text-gray-600">{filteredBlogs.length} blogs found</p>
@@ -456,11 +242,11 @@ export default function BlogAdmin() {
         {/* Blog cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredBlogs.map((blog) => (
-            <BlogCard
-              key={blog.id}
-              blog={blog}
-              onEdit={handleEditBlog}
-              onDelete={handleDeleteBlog}
+            <BlogCard 
+              key={blog.id} 
+              blog={blog} 
+              onEdit={handleEditBlog} 
+              onDelete={handleDeleteBlog} 
             />
           ))}
           {filteredBlogs.length === 0 && (
@@ -480,10 +266,10 @@ export default function BlogAdmin() {
               Fill in the details below to {dialogMode === 'add' ? 'create a new' : 'update the'} blog.
             </DialogDescription>
           </DialogHeader>
-          <BlogForm
-            blog={currentBlog}
-            onSubmit={handleFormSubmit}
-            onCancel={handleDialogClose}
+          <BlogForm 
+            blog={currentBlog} 
+            onSubmit={handleFormSubmit} 
+            onCancel={handleDialogClose} 
           />
         </DialogContent>
       </Dialog>
