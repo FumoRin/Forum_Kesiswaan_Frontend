@@ -35,7 +35,7 @@ const BlogPage = () => {
       date: '16 Agustus 2024',
       author: 'Admin Sekolah',
       content:
-        'Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah. Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi kebersihan, kerapihan, dan kreativitas dalam mendekorasi ruang belajar serta kamar mandi. Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.',
+        '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah.</p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
       thumbnail: thumbnail,
       gallery: [
         {
@@ -64,7 +64,7 @@ const BlogPage = () => {
       date: '20 September 2024',
       author: 'Admin Sekolah',
       content:
-        'Pentas seni tahunan ini menjadi ajang untuk menampilkan kreativitas siswa melalui berbagai pertunjukan seni seperti musik, tari, drama, dan lainnya. Acara ini juga dihadiri oleh tamu undangan dari beberapa sekolah sekitar dan menjadi momen untuk mempererat hubungan antar sekolah.',
+        '<h2>Pentas Seni Tahunan 2024</h2><p>Pentas seni tahunan ini menjadi ajang untuk menampilkan kreativitas siswa melalui berbagai pertunjukan seni seperti:</p><ul><li>Musik</li><li>Tari</li><li>Drama</li><li>Seni rupa</li></ul><p>Acara ini juga dihadiri oleh tamu undangan dari beberapa sekolah sekitar dan menjadi momen untuk mempererat hubungan antar sekolah.</p>',
       thumbnail: thumbnail,
     },
   ];
@@ -93,7 +93,7 @@ const BlogPage = () => {
   }
 
   return (
-    <div className=" p-6 bg-gray-50 w-full mt-navbar" >
+    <div className="p-6 bg-gray-50 w-full mt-navbar" >
       <div className="max-w-5xl mx-auto">
         <Button 
           variant="outline" 
@@ -151,10 +151,11 @@ const BlogPage = () => {
           <Separator />
           
           <CardContent className="pt-6">
-            {/* Blog Content */}
-            <div className="prose max-w-none text-gray-700">
-              <p className="text-lg leading-relaxed">{blog.content}</p>
-            </div>
+            {/* Blog Content - Render HTML content */}
+            <div 
+              className="prose prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none text-gray-700"
+              dangerouslySetInnerHTML={{ __html: blog.content }}
+            />
 
             {/* Gallery Section */}
             {blog.gallery && blog.gallery.length > 0 && (

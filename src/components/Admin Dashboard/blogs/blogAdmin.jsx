@@ -9,14 +9,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Search, File, Building, Plus } from "lucide-react";
+import { Search, File, Building, Plus, ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogCard from "./blogCard";
@@ -31,46 +24,21 @@ const sampleResults = [
     school: 'SMK Negeri 1 Cimahi',
     event: 'Lomba WS Terbersih',
     date: '16 Agustus 2024',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo vel massa tempor aliquam.',
+    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah.</p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
     status: 'published',
     thumbnail: thumbnailBlog,
+    gallery: [
+      {
+        original: 'https://picsum.photos/id/1018/800/600',
+        thumbnail: 'https://picsum.photos/id/1018/200/150',
+      },
+      {
+        original: 'https://picsum.photos/id/1025/800/600',
+        thumbnail: 'https://picsum.photos/id/1025/200/150',
+      },
+    ],
   },
-  {
-    id: '2',
-    title: 'Festival Seni Budaya Sekolah',
-    school: 'SMA Negeri 2 Bandung',
-    event: 'Festival Budaya',
-    date: '20 Agustus 2024',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo vel massa tempor aliquam.',
-    status: 'published',
-  },
-  {
-    id: '3',
-    title: 'Olimpiade Matematika Tingkat SMA',
-    school: 'SMA Negeri 3 Jakarta',
-    event: 'Olimpiade Matematika',
-    date: '25 Agustus 2024',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo vel massa tempor aliquam.',
-    status: 'draft',
-  },
-  {
-    id: '4',
-    title: 'Kompetisi Robotik Nasional',
-    school: 'SMK Negeri 4 Surabaya',
-    event: 'Kompetisi Robotik',
-    date: '1 September 2024',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo vel massa tempor aliquam.',
-    status: 'published',
-  },
-  {
-    id: '5',
-    title: 'Turnamen Olahraga Antar SMA',
-    school: 'SMA Negeri 1 Yogyakarta',
-    event: 'Turnamen Olahraga',
-    date: '5 September 2024',
-    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam at justo vel massa tempor aliquam.',
-    status: 'draft',
-  },
+  // ... other sample data
 ];
 
 export default function BlogAdmin() {
@@ -80,9 +48,9 @@ export default function BlogAdmin() {
   const [institution, setInstitution] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [currentBlog, setCurrentBlog] = useState(null);
-  const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
+  const [formMode, setFormMode] = useState('add'); // 'add' or 'edit'
   
   const [activeTab, setActiveTab] = useState('all');
 
@@ -112,14 +80,14 @@ export default function BlogAdmin() {
 
   const handleAddBlog = () => {
     setCurrentBlog(null);
-    setDialogMode('add');
-    setIsDialogOpen(true);
+    setFormMode('add');
+    setShowForm(true);
   };
 
   const handleEditBlog = (blog) => {
     setCurrentBlog(blog);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
+    setFormMode('edit');
+    setShowForm(true);
   };
 
   const handleDeleteBlog = (id) => {
@@ -129,19 +97,63 @@ export default function BlogAdmin() {
   };
 
   const handleFormSubmit = (formData) => {
-    if (dialogMode === 'add') {
+    if (formMode === 'add') {
       // Generate a simple ID for demo purposes
       const newId = (Math.max(...blogs.map(b => parseInt(b.id))) + 1).toString();
       setBlogs(prev => [...prev, { ...formData, id: newId }]);
     } else {
       setBlogs(prev => prev.map(blog => blog.id === formData.id ? formData : blog));
     }
-    setIsDialogOpen(false);
+    setShowForm(false);
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
+  const handleFormCancel = () => {
+    setShowForm(false);
   };
+
+  if (showForm) {
+    return (
+      <div className="mt-navbar flex flex-col pb-10">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/blogs">Blogs</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink>{formMode === 'add' ? 'Add New Blog' : 'Edit Blog'}</BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <hr className="my-4 border-t" />
+
+        <div className="flex flex-col">
+          <div className="flex justify-between items-center ">
+            <div className="flex items-center">
+              <Button variant="ghost" onClick={handleFormCancel} className="mr-2">
+                <ArrowLeft size={16} className="mr-2" /> Back to Blogs
+              </Button>
+              <h1 className="text-2xl font-bold">{formMode === 'add' ? 'Add New Blog' : 'Edit Blog'}</h1>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg p-6">
+            <BlogForm 
+              blog={currentBlog} 
+              onSubmit={handleFormSubmit} 
+              onCancel={handleFormCancel} 
+              mode={formMode}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-navbar flex flex-col">
@@ -256,23 +268,6 @@ export default function BlogAdmin() {
           )}
         </div>
       </div>
-
-      {/* Dialog for Add/Edit blog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{dialogMode === 'add' ? 'Add New Blog' : 'Edit Blog'}</DialogTitle>
-            <DialogDescription>
-              Fill in the details below to {dialogMode === 'add' ? 'create a new' : 'update the'} blog.
-            </DialogDescription>
-          </DialogHeader>
-          <BlogForm 
-            blog={currentBlog} 
-            onSubmit={handleFormSubmit} 
-            onCancel={handleDialogClose} 
-          />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

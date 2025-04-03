@@ -16,6 +16,7 @@ const sampleResults = [
     school: 'SMK Negeri 1 Cimahi',
     event: 'Lomba WS Terbersih',
     date: '16 Agustus 2024',
+    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah.</p>',
     thumbnail: thumbnailBlog,
   },
   {
