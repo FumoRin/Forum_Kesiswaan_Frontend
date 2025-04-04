@@ -264,10 +264,10 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose focus:outline-none min-h-[300px]',
+        class: 'focus:outline-none min-h-[300px] max-w-none w-full',
       },
     },
-  });~~
+  });
 
   // Update editor content when blog data changes
   useEffect(() => {
@@ -379,7 +379,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
   };
 
   return (
-    <div className="container md:px-6">
+    <div className="md:px-6">
 
       {/* Main Form */}
       <form id="blog-form" onSubmit={handleSubmit} className="space-y-6">
@@ -416,18 +416,18 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
                       <TabsTrigger value="preview">Preview</TabsTrigger>
                     </TabsList>
                     
-                    <TabsContent value="content" className="mt-2">
+                    <TabsContent value="content" className="mt-2 ">
                       <div className="border rounded-md overflow-hidden">
                         <MenuBar editor={editor} />
                         <EditorContent 
                           editor={editor} 
-                          className="min-h-[400px] p-4 bg-white prose prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none"
+                          className="min-h-[400px] p-4 bg-white prose prose-headings:font-bold prose-h2:text-3xl prose-h3:text-2xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none w-full prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto"
                         />
                       </div>
                     </TabsContent>
                     
                     <TabsContent value="preview" className="mt-2">
-                      <div className="border rounded-md p-4 min-h-[400px] prose prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none bg-white">
+                      <div className="border rounded-md p-6 min-h-[400px] prose prose-headings:font-bold prose-h2:text-3xl prose-h3:text-2xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none bg-white prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto">
                         {previewContent ? (
                           <div dangerouslySetInnerHTML={{ __html: previewContent }} />
                         ) : (

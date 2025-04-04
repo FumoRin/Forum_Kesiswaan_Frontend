@@ -46,6 +46,9 @@ const BlogCard = ({ blog, onEdit, onDelete }) => {
           <Edit size={16} className="mr-2" />
           Edit
         </Button>
+        <Button variant="outline" size="sm" onClick={() => window.open(`/blog/${blog.id}`, '_blank')}>
+          View Blog
+        </Button>
         <Button variant="destructive" size="sm" onClick={() => onDelete(blog.id)}>
           <Trash2 size={16} className="mr-2" />
           Delete

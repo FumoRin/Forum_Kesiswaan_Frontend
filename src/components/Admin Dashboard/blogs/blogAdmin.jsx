@@ -24,7 +24,7 @@ const sampleResults = [
     school: 'SMK Negeri 1 Cimahi',
     event: 'Lomba WS Terbersih',
     date: '16 Agustus 2024',
-    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah.</p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
+    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nisl risus, sodales eu sem vel, fermentum suscipit justo. Nam ut ex ut orci placerat ultrices non vel quam. Aenean ac nisi vitae felis eleifend lobortis. Donec convallis fermentum arcu, eu maximus ex facilisis quis. Vivamus vitae dui ut ex convallis aliquam ultricies sit amet dui. Vivamus sed laoreet diam, non auctor arcu. Sed sodales quam id semper tincidunt. Phasellus lobortis porta faucibus. Vestibulum eu mauris urna. </p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
     status: 'published',
     thumbnail: thumbnailBlog,
     gallery: [
@@ -142,7 +142,7 @@ export default function BlogAdmin() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6">
+          <div className="bg-white rounded-lg pt-6">
             <BlogForm 
               blog={currentBlog} 
               onSubmit={handleFormSubmit} 
