@@ -8,6 +8,7 @@ import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
 import AuthPage from './components/login/page'
+import AdminNavbar from "./components/adminNavbar"
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 
@@ -63,7 +64,7 @@ const AuthLayout = () => (
 
 const AdminLayout = () => (
   <>
-    <Navbar />
+    <AdminNavbar />
     <main className="flex-1 py-4 px-8 ">
       <Outlet />
     </main>
