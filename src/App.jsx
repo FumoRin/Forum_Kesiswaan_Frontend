@@ -10,6 +10,7 @@ import Footer from './components/footer'
 import AuthPage from './components/login/page'
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
+import UserDashboard from "./components/User Dashboard/userDashboard"
 
 function App() {
   return (
@@ -37,6 +38,11 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserAdmin />} />
             <Route path="/admin/blogs" element={<BlogAdmin />} />
+          </Route>
+
+          {/* User Dashboard Routes */}
+          <Route element={<UserDashboardLayout />}>
+            <Route path="/userdashboard" element={<UserDashboard />} />
           </Route>
         </Routes>
       </div>
@@ -69,6 +75,16 @@ const AdminLayout = () => (
     </main>
     <Footer />
   </>
-)
+);
+
+const UserDashboardLayout = () => (
+  <>
+    <Navbar />
+    <main className="flex-1 py-4 px-8 ">
+      <Outlet />
+    </main>
+    <Footer />
+  </>
+);
 
 export default App
