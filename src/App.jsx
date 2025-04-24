@@ -8,40 +8,45 @@ import BlogPage from "./components/Blog Page/blogPage"
 import Navbar from './components/navbar'
 import Footer from './components/footer'  
 import AuthPage from './components/login/page'
-import AdminNavbar from "./components/adminNavbar"
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 
+import PrivateRoutes from "./components/utils/protectedRoutes"
+import { AuthProvider } from "./components/utils/authProvider"
+
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col">
-        <Routes>
-          {/* Main Component */}
-          <Route element={<MainLayout />}>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/search-results" element={<SearchResults />} />
-            <Route path="/blog/:id" element={<BlogPage />} />
-          </Route> 
-          
-          {/* Auth Routes - without Navbar/Footer */}
-          <Route element={<AuthLayout />}>
-            <Route path="/auth" element={
-              <div className="flex min-h-screen items-center justify-center">
-                <AuthPage />
-              </div>
-            } />
-          </Route>
-
-          {/* Admin Routes */}
-          <Route element={<AdminLayout />}>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UserAdmin />} />
-            <Route path="/admin/blogs" element={<BlogAdmin />} />
-          </Route>
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <Routes>
+            {/* Main Component */}
+            <Route element={<MainLayout />}>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/search-results" element={<SearchResults />} />
+              <Route path="/blog/:id" element={<BlogPage />} />
+            </Route>
+      
+            {/* Auth Routes - without Navbar/Footer */}
+            <Route element={<AuthLayout />}>
+              <Route path="/auth" element={
+                <div className="flex min-h-screen items-center justify-center">
+                  <AuthPage />
+                </div>
+              } />
+            </Route>
+            {/* Admin Routes */}
+            <Route element={<PrivateRoutes requiredRole="admin"/>}>
+              <Route element={<AdminLayout />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<UserAdmin />} />
+                <Route path="/admin/blogs" element={<BlogAdmin />} />
+              </Route>
+            </Route>
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   )
 }
 
@@ -64,7 +69,7 @@ const AuthLayout = () => (
 
 const AdminLayout = () => (
   <>
-    <AdminNavbar />
+    <Navbar />
     <main className="flex-1 py-4 px-8 ">
       <Outlet />
     </main>

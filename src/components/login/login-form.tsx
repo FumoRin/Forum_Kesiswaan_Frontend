@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../utils/authProvider";
 
 export function LoginForm({
   className,
@@ -15,6 +16,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,13 +39,16 @@ export function LoginForm({
         throw new Error(data.message || "Login failed");
       }
 
-      // Store the token or user data in localStorage/sessionStorage if needed
       if (data.token) {
-        localStorage.setItem("token", data.token);
+        login(data.token, data.role);
       }
 
       // Redirect to homepage
-      navigate("/");
+      if (data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Login failed. Please try again."
