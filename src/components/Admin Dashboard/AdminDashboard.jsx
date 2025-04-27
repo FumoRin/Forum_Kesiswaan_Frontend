@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="h-screen-navbar mt-navbar">
+    <div className="mt-navbar">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
