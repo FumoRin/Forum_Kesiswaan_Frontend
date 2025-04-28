@@ -11,6 +11,7 @@ import AuthPage from './components/login/page'
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 import UserDashboard from "./components/User Dashboard/userDashboard"
+import UserBlog from "./components/User Dashboard/userBlog"
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
           {/* User Dashboard Routes */}
           <Route element={<UserDashboardLayout />}>
             <Route path="/userdashboard" element={<UserDashboard />} />
+            <Route path="/userdashboard/blogs" element={<UserBlog />} />
           </Route>
         </Routes>
       </div>
