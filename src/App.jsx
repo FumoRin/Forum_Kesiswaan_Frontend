@@ -10,6 +10,8 @@ import Footer from './components/footer'
 import AuthPage from './components/login/page'
 import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
+import UserDashboard from "./components/User Dashboard/userDashboard"
+import UserBlog from "./components/User Dashboard/userBlog"
 
 import PrivateRoutes from "./components/utils/protectedRoutes"
 import { AuthProvider } from "./components/utils/authProvider"
@@ -43,7 +45,13 @@ function App() {
                 <Route path="/admin/blogs" element={<BlogAdmin />} />
               </Route>
             </Route>
-          </Routes>
+  
+          {/* User Dashboard Routes */}
+          <Route element={<UserDashboardLayout />}>
+            <Route path="/userdashboard" element={<UserDashboard />} />
+            <Route path="/userdashboard/blogs" element={<UserBlog />} />
+          </Route>
+        </Routes>
         </div>
       </Router>
     </AuthProvider>
@@ -69,12 +77,22 @@ const AuthLayout = () => (
 
 const AdminLayout = () => (
   <>
+    <AdminNavbar />
+    <main className="flex-1 py-4 px-8 ">
+      <Outlet />
+    </main>
+    <Footer />
+  </>
+);
+
+const UserDashboardLayout = () => (
+  <>
     <Navbar />
     <main className="flex-1 py-4 px-8 ">
       <Outlet />
     </main>
     <Footer />
   </>
-)
+);
 
 export default App
