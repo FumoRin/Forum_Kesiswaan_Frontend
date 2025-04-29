@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom'
 import './App.css'
+import { Toaster } from '@/components/ui/toaster'
 
 import Homepage from './components/Home Page/homePage'
 import AdminDashboard from "./components/Admin Dashboard/AdminDashboard"
@@ -52,6 +53,7 @@ function App() {
             <Route path="/userdashboard/blogs" element={<UserBlog />} />
           </Route>
         </Routes>
+        <Toaster />
         </div>
       </Router>
     </AuthProvider>
@@ -77,7 +79,7 @@ const AuthLayout = () => (
 
 const AdminLayout = () => (
   <>
-    <AdminNavbar />
+    <Navbar />
     <main className="flex-1 py-4 px-8 ">
       <Outlet />
     </main>
