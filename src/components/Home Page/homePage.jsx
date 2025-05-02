@@ -18,10 +18,12 @@ const Homepage = () => {
   return (
     <Parallax pages={4} className="relative">
       {/* ----------------- Background Layers ----------------- */}
+      {/* Halaman 1 */}
       <ParallaxLayer
-        offset={0}
-        speed={-1}
-        factor={1}
+        offset={0} // Mulai dari halaman 1
+        speed={-0.2}
+        factor={1} // Mengisi 1 halaman penuh
+        z-index={30}
         style={{
           backgroundImage: `url(${home1})`,
           backgroundSize: 'cover',
@@ -29,21 +31,25 @@ const Homepage = () => {
         }}
       />
       
+      {/* Halaman 2 */}
       <ParallaxLayer
-        offset={2}
-        speed={-1}
+        offset={1} // Mulai dari halaman 2
+        speed={0}
         factor={1}
         style={{
+          zIndex: 20,
           backgroundImage: `url(${home2})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
       
+      {/* Halaman 3 */}
       <ParallaxLayer
-        offset={2}
-        speed={-1}
+        offset={2} // Mulai dari halaman 3
+        speed={-0.2}
         factor={1}
+        z-index={10}
         style={{
           backgroundImage: `url(${home3})`,
           backgroundSize: 'cover',
@@ -52,16 +58,16 @@ const Homepage = () => {
       />
 
       {/* ----------------- Page 1 Content ----------------- */}
-      <ParallaxLayer offset={0} speed={0} factor={1} className="flex items-center justify-center">
+      <ParallaxLayer offset={0} speed={0} factor={1} style={{ zIndex: 40 }} className="flex items-center justify-center">
         <div className="container mx-auto px-4 md:px-8 text-left space-y-14">
           <div className="space-y-4">
             <h1 className="text-5xl md:text-7xl font-bold text-[#DF2E38]">
               Forum Kesiswaan Cimahi
             </h1>
-            <p className="text-xl md:text-2xl text-white max-w-2xl">
+            <p className="text-xl md:text-2xl text-[#DF2E38] max-w-2xl">
               Platform akses dokumentasi kegiatan semua sekolah di Kota Cimahi
             </p>
-            <button className="text-sm md:text-base text-white hover:text-[#49B1E6]">
+            <button className="text-sm md:text-base text-[#DF2E38] hover:text-[#49B1E6]">
               Pelajari lebih lanjut &gt;
             </button>
           </div>
@@ -69,7 +75,7 @@ const Homepage = () => {
       </ParallaxLayer>
 
       {/* ----------------- Page 2 Content ----------------- */}
-      <ParallaxLayer offset={1} speed={0} className="flex items-center bg-black p-8">
+      <ParallaxLayer offset={1} speed={0} style={{ zIndex: 40 }} className="flex items-center bg-black/50 p-8">
         <div className="container mx-auto text-white">
           <h2 className="text-4xl font-bold mb-6">Tentang Kami</h2>
           <p className="text-lg max-w-2xl">
@@ -80,12 +86,13 @@ const Homepage = () => {
       </ParallaxLayer>
 
       {/* ----------------- Page 3 (Empty) ----------------- */}
-      <ParallaxLayer offset={2} speed={0} factor={0.5} />
+      <ParallaxLayer offset={2} speed={0} factor={0} style={{ zIndex: 40 }}/>
 
       {/* ----------------- Search Section ----------------- */}
       <ParallaxLayer 
         offset={3} 
-        speed={0.5} 
+        speed={0} 
+        style={{ zIndex: 40 }}
         className="bg-white flex items-center justify-center min-h-screen"
       >
         <div className="w-full max-w-6xl mx-auto py-20 px-4">
