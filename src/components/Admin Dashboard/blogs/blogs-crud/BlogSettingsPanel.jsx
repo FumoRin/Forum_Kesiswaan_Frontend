@@ -1,0 +1,165 @@
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Calendar, School, Award, ImageIcon } from 'lucide-react';
+
+const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleDateSelect, handleChange, handleThumbnailChange }) => {
+  // Helper to get the thumbnail source URL
+  const getThumbnailSrc = () => {
+    if (!formData.thumbnail) return null;
+    // If thumbnail is a string (URL from existing blog data)
+    if (typeof formData.thumbnail === 'string') return formData.thumbnail;
+    // If thumbnail is an object with a URL (likely from file selection or updated blog data)
+    if (typeof formData.thumbnail === 'object' && formData.thumbnail.url) return formData.thumbnail.url;
+    // Add more checks if your structure can be different
+    return null; // Fallback
+  };
+
+  const thumbnailSrc = getThumbnailSrc();
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle>Publication Settings</CardTitle>
+          <CardDescription>
+            Configure blog post settings
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="status" className="flex items-center gap-2">
+                Status <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => handleSelectChange('status', value)}
+                required // Added required attribute to match input fields
+              >
+                <SelectTrigger id="status" className="bg-white">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="date" className="flex items-center gap-2">
+                <Calendar size={16} /> Date <span className="text-red-500">*</span>
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal bg-white ${
+                      !selectedDate && "text-muted-foreground"
+                    }`}
+                  >
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {selectedDate ? (
+                      formData.date // Display the formatted date string
+                    ) : (
+                      <span>Select date</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate} // Pass the Date object here
+                    onSelect={handleDateSelect}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle>Blog Details</CardTitle>
+          <CardDescription>
+            Add details about the blog post
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="school" className="flex items-center gap-2">
+                <School size={16} /> School <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="school"
+                name="school"
+                value={formData.school}
+                onChange={handleChange}
+                placeholder="Enter school name"
+                required
+                className="bg-white"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="event" className="flex items-center gap-2">
+                <Award size={16} /> Event <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="event"
+                name="event"
+                value={formData.event}
+                onChange={handleChange}
+                placeholder="Enter event name"
+                required
+                className="bg-white"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="thumbnail" className="flex items-center gap-2">
+                <ImageIcon size={16} /> Thumbnail
+              </Label>
+              <Input
+                id="thumbnail"
+                name="thumbnail"
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                className="bg-white" // Added bg-white for consistency
+              />
+
+              {thumbnailSrc && (
+                <div className="mt-2 border rounded overflow-hidden">
+                  <img
+                    src={thumbnailSrc} // Use the helper function result
+                    alt="Thumbnail Preview"
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default BlogSettingsPanel;
+

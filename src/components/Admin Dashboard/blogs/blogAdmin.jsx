@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -11,38 +11,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Search, File, Building, Plus, ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import axios from 'axios';
 
 import BlogCard from "./blogCard";
 import BlogForm from "./blogs-crud/blogForm";
-import thumbnailBlog from "../../../assets/thumbnail.jpg";
-
-// Sample data
-const sampleResults = [
-  {
-    id: '1',
-    title: 'Lomba Kebersihan Antar Sekolah',
-    school: 'SMK Negeri 1 Cimahi',
-    event: 'Lomba WS Terbersih',
-    date: '16 Agustus 2024',
-    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nisl risus, sodales eu sem vel, fermentum suscipit justo. Nam ut ex ut orci placerat ultrices non vel quam. Aenean ac nisi vitae felis eleifend lobortis. Donec convallis fermentum arcu, eu maximus ex facilisis quis. Vivamus vitae dui ut ex convallis aliquam ultricies sit amet dui. Vivamus sed laoreet diam, non auctor arcu. Sed sodales quam id semper tincidunt. Phasellus lobortis porta faucibus. Vestibulum eu mauris urna. </p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
-    status: 'published',
-    thumbnail: thumbnailBlog,
-    gallery: [
-      {
-        original: 'https://picsum.photos/id/1018/800/600',
-        thumbnail: 'https://picsum.photos/id/1018/200/150',
-      },
-      {
-        original: 'https://picsum.photos/id/1025/800/600',
-        thumbnail: 'https://picsum.photos/id/1025/200/150',
-      },
-    ],
-  },
-  // ... other sample data
-];
+import { useAuth } from "@/components/utils/authProvider";
 
 export default function BlogAdmin() {
-  const [blogs, setBlogs] = useState(sampleResults);
+  const [blogs, setBlogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [eventType, setEventType] = useState('');
   const [institution, setInstitution] = useState('');
@@ -50,9 +27,56 @@ export default function BlogAdmin() {
   
   const [showForm, setShowForm] = useState(false);
   const [currentBlog, setCurrentBlog] = useState(null);
-  const [formMode, setFormMode] = useState('add'); // 'add' or 'edit'
+  const [formMode, setFormMode] = useState('add'); 
   
   const [activeTab, setActiveTab] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const { toast } = useToast();
+  const { token } = useAuth();
+
+  const API_URL = "http://localhost:3000";
+
+  // Fetch blogs from API
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/events`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      // Convert the API response to match expected blog format
+      const formattedBlogs = response.data.map(event => ({
+        id: event.id.toString(),
+        title: event.title,
+        school: event.school,
+        event: event.event,
+        date: event.date,
+        content: event.content,
+        status: event.status,
+        thumbnail: event.thumbnail,
+        gallery: event.gallery ? JSON.parse(event.gallery) : []
+      }));
+      setBlogs(formattedBlogs);
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+      setError("Failed to load blogs. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to load blogs. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter blogs based on search and filters
   const filteredBlogs = blogs.filter(blog => {
@@ -90,21 +114,119 @@ export default function BlogAdmin() {
     setShowForm(true);
   };
 
-  const handleDeleteBlog = (id) => {
+  const handleDeleteBlog = async (id) => {
     if (window.confirm('Are you sure you want to delete this blog?')) {
-      setBlogs(prev => prev.filter(blog => blog.id !== id));
+      setLoading(true);
+      try {
+        await axios.delete(`${API_URL}/events/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setBlogs(prev => prev.filter(blog => blog.id !== id));
+        toast({
+          title: "Success",
+          description: "Blog deleted successfully",
+        });
+      } catch (err) {
+        console.error("Error deleting blog:", err);
+        toast({
+          title: "Error",
+          description: "Failed to delete blog. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handleFormSubmit = (formData) => {
-    if (formMode === 'add') {
-      // Generate a simple ID for demo purposes
-      const newId = (Math.max(...blogs.map(b => parseInt(b.id))) + 1).toString();
-      setBlogs(prev => [...prev, { ...formData, id: newId }]);
-    } else {
-      setBlogs(prev => prev.map(blog => blog.id === formData.id ? formData : blog));
+  const handleFormSubmit = async (formData) => {
+    setLoading(true);
+    try {
+      let response;
+      
+      // Create a FormData object for file uploads
+      const formDataObj = new FormData();
+      formDataObj.append('title', formData.title);
+      formDataObj.append('school', formData.school);
+      formDataObj.append('event', formData.event);
+      formDataObj.append('date', formData.date);
+      formDataObj.append('content', formData.content);
+      formDataObj.append('status', formData.status);
+      
+      // Handle thumbnail upload
+      if (formData.thumbnail?.file) {
+        formDataObj.append('thumbnail', formData.thumbnail.file);
+      }
+      
+      // Handle gallery uploads
+      if (formData.gallery && formData.gallery.length > 0) {
+        formData.gallery.forEach((item, index) => {
+          if (item.file) {
+            formDataObj.append('gallery', item.file);
+          }
+        });
+      }
+      
+      if (formMode === 'add') {
+        response = await axios.post(`${API_URL}/events`, formDataObj, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setBlogs(prev => [...prev, {
+          id: response.data.id.toString(),
+          title: response.data.title,
+          school: response.data.school,
+          event: response.data.event,
+          date: response.data.date,
+          content: response.data.content,
+          status: response.data.status,
+          thumbnail: response.data.thumbnail,
+          gallery: response.data.gallery || []
+        }]);
+        toast({
+          title: "Success",
+          description: "Blog created successfully",
+        });
+      } else {
+        response = await axios.put(`${API_URL}/events/${formData.id}`, formDataObj, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setBlogs(prev => prev.map(blog => 
+          blog.id === formData.id ? {
+            id: response.data.id.toString(),
+            title: response.data.title,
+            school: response.data.school,
+            event: response.data.event,
+            date: response.data.date,
+            content: response.data.content,
+            status: response.data.status,
+            thumbnail: response.data.thumbnail,
+            gallery: response.data.gallery || []
+          } : blog
+        ));
+        toast({
+          title: "Success",
+          description: "Blog updated successfully",
+        });
+      }
+      setShowForm(false);
+    } catch (err) {
+      console.error("Error submitting blog:", err);
+      toast({
+        title: "Error",
+        description: "Failed to save blog. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-    setShowForm(false);
   };
 
   const handleFormCancel = () => {
@@ -174,7 +296,7 @@ export default function BlogAdmin() {
       <div className="flex flex-col">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Blog Admin</h1>
-          <Button onClick={handleAddBlog}>
+          <Button onClick={handleAddBlog} disabled={loading}>
             <Plus size={16} className="mr-2" /> Add Blog
           </Button>
         </div>
@@ -251,22 +373,41 @@ export default function BlogAdmin() {
           <p className="text-gray-600">{filteredBlogs.length} blogs found</p>
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="text-center py-8 text-red-500">
+            <p>{error}</p>
+            <Button onClick={fetchBlogs} variant="outline" className="mt-4">
+              Try Again
+            </Button>
+          </div>
+        )}
+
         {/* Blog cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredBlogs.map((blog) => (
-            <BlogCard 
-              key={blog.id} 
-              blog={blog} 
-              onEdit={handleEditBlog} 
-              onDelete={handleDeleteBlog} 
-            />
-          ))}
-          {filteredBlogs.length === 0 && (
-            <div className="col-span-3 py-16 text-center text-gray-500">
-              <p>No blogs found with the current filters.</p>
-            </div>
-          )}
-        </div>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredBlogs.map((blog) => (
+              <BlogCard 
+                key={blog.id} 
+                blog={blog} 
+                onEdit={handleEditBlog} 
+                onDelete={handleDeleteBlog} 
+              />
+            ))}
+            {filteredBlogs.length === 0 && (
+              <div className="col-span-3 py-16 text-center text-gray-500">
+                <p>No blogs found with the current filters.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
