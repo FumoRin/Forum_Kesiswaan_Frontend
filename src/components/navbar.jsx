@@ -8,7 +8,7 @@ import { useAuth } from "./utils/authProvider";
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isAdmin = location.pathname.startsWith('/admin');
+  const isAdminRoute = location.pathname.startsWith('/admin');
   const { isAuthenticated, logout, userRole } = useAuth();
 
   const handleLogout = () => {
@@ -17,7 +17,6 @@ const Navbar = () => {
   };
 
   return (
-
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#2A2828]/50 backdrop-blur-md p-4 flex justify-between items-center">
       {/* Logo Section */}
       <Link to="/">
@@ -26,7 +25,7 @@ const Navbar = () => {
 
       {/* Center Navigation Links */}
       <div className="hidden md:flex space-x-4 text-white absolute left-1/2 transform -translate-x-1/2">
-        {userRole !== isAdmin ? (
+        {!isAdminRoute ? (
             <>
               <Link
                 to="/"
@@ -85,7 +84,7 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        {isAdmin ? (
+        {isAdminRoute ? (
           <Button
             variant="outline"
             onClick={() => navigate('/')}
@@ -94,13 +93,15 @@ const Navbar = () => {
             Homepage
           </Button>
         ) : (
-          <Button
-            variant="outline"
-            onClick={() => navigate('/admin')}
-            className="text-black border-[#DDD8D6] hover:bg-[#DF2E38] hover:border-[#DF2E38]"
-          >
-            Dashboard
-          </Button>
+          userRole === "admin" && (
+            <Button
+              variant="outline"
+              onClick={() => navigate('/admin')}
+              className="text-black border-[#DDD8D6] hover:bg-[#DF2E38] hover:text-white hover:border-[#DF2E38]"
+            >
+              Dashboard
+            </Button>
+          )
         )}
 
         {isAuthenticated ? (

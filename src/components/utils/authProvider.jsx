@@ -3,21 +3,33 @@ import { createContext, useContext, useEffect, useState } from "react";
 export const authContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-
-  useEffect(() => {
+  // Initialize state from localStorage synchronously
+  const initializeAuth = () => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       try {
         const payload = JSON.parse(atob(storedToken.split(".")[1]));
-        setToken(storedToken);
-        setUserRole(payload.role);
+        return {
+          token: storedToken,
+          userRole: payload.role
+        };
       } catch (error) {
-        console.error("Error parsing token:", error); 
-        logout(); 
+        console.error("Error parsing token:", error);
+        localStorage.removeItem("token");
       }
     }
+    return { token: null, userRole: null };
+  };
+
+  // Initialize state synchronously to avoid the flash of unauthenticated state
+  const initialAuth = initializeAuth();
+  const [token, setToken] = useState(initialAuth.token);
+  const [userRole, setUserRole] = useState(initialAuth.userRole);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Just mark loading as complete after the initial render
+    setLoading(false);
   }, []);
 
   const login = (userToken, role) => {
@@ -35,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!token;
 
   return (
-    <authContext.Provider value={{ token, login, logout, isAuthenticated, userRole }}>
+    <authContext.Provider value={{ token, login, logout, isAuthenticated, userRole, loading }}>
       {children}
     </authContext.Provider>
   );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/utils/authProvider";
 
 import {
   Breadcrumb,
@@ -9,16 +10,20 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 import { columns } from "./tables/column";
 import { DataTable } from "./tables/data-tables";
 import { UserPlus } from "lucide-react"; 
 
 import UserForm from "./formInput";
-import DeleteUserDialog from "./user-crud/deleteUser"; // New import
+import DeleteUserDialog from "./user-crud/deleteUser"; 
 
 
 export default function UserAdmin() {
+  const { token } = useAuth();
+  const { toast } = useToast();
+
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
@@ -40,76 +45,159 @@ export default function UserAdmin() {
 
   const handleDeleteUser = (userId) => {
     const userToDelete = users.find(user => user.id === userId);
+    if (!userToDelete) return;
+    
     setUserToDelete(userToDelete);
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDeleteUser = () => {
-    if (userToDelete) {
+  const confirmDeleteUser = async () => {
+    if (!userToDelete || !token) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`http://localhost:3000/users/${userToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to Delete User: ${response.statusText}`);
+      }
+
       setUsers(users.filter(user => user.id !== userToDelete.id));
+      
+      toast({
+        title: "Success",
+        description: `User "${userToDelete.full_name}" deleted successfully`,
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setError(error.message || "An error occurred while deleting user");
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while deleting user",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
     }
   };
 
-  const handleFormSubmit = (userData) => {
-    if (currentUser) {
-      // Editing existing user
-      setUsers(users.map(user => 
-        user.id === currentUser.id ? { ...userData, id: user.id, updated_at: new Date().toISOString() } : user
-      ));
-    } else {
-      // Adding new user
-      const newUser = {
-        ...userData,
-        id: (Math.max(...users.map(user => parseInt(user.id))) + 1).toString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setUsers([...users, newUser]);
+  const handleFormSubmit = async (userData) => {
+    if (!token) {
+      setError("No token found");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      let url = "http://localhost:3000/users";
+      let method = "POST";
+
+      // API request based on add or update
+      if (currentUser) {
+        url = `${url}/${currentUser.id}`;
+        method = "PUT";
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${method === "POST" ? "create" : "update"} user: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (currentUser) {
+        setUsers(users.map(user => 
+          user.id === currentUser.id ? result : user
+        ));
+        toast({
+          title: "Success!",
+          description: `User "${result.full_name}" has been updated`
+        });
+      } else {
+        setUsers([...users, result]);
+        toast({
+          title: "Success",
+          description: `User "${result.full_name}" has been created`
+        });
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.log(`Error ${currentUser ? 'updating' : 'creating'} user: `, error);
+      setError(error.message || `An error occurred while ${currentUser ? 'updating' : 'creating'} user`);
+      toast({
+        title: "Error",
+        description: error.message || `An error occurred while ${currentUser ? 'updating' : 'creating'} user`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        setError("No token found");
-        return;
-      }
-      try {
-        const response = await fetch("http://localhost:3000/users", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-        });
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            throw new Error("Unauthorized");
-          } else if (response.status === 403) {
-            throw new Error("Forbidden");
-          } else {
-            throw new Error("Failed to fetch users");
-          }
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token")
+    if (!token) {
+      setError("No token found");
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:3000/users", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Unauthorized");
+        } else if (response.status === 403) {
+          throw new Error("Forbidden");
+        } else {
+          throw new Error("Failed to fetch users");
         }
-
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        setError(
-          error.message || "An error occurred while fetching users"
-        );
-      } finally {
-        setIsLoading(false);
       }
-    };
 
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError(
+        error.message || "An error occurred while fetching users"
+      );
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while fetching users",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
     fetchUsers();
-  })
+  }, []);
 
   return (
     <div className="flex mt-navbar flex-col">
