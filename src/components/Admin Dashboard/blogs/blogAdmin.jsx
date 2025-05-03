@@ -6,10 +6,18 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, File, Building, Plus, ArrowLeft } from "lucide-react";
+import { Search, File, Building, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
@@ -32,6 +40,9 @@ export default function BlogAdmin() {
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedBlogId, setSelectedBlogId] = useState(null);
   
   const { toast } = useToast();
   const { token } = useAuth();
@@ -115,29 +126,35 @@ export default function BlogAdmin() {
   };
 
   const handleDeleteBlog = async (id) => {
-    if (window.confirm('Are you sure you want to delete this blog?')) {
-      setLoading(true);
-      try {
-        await axios.delete(`${API_URL}/events/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setBlogs(prev => prev.filter(blog => blog.id !== id));
-        toast({
-          title: "Success",
-          description: "Blog deleted successfully",
-        });
-      } catch (err) {
-        console.error("Error deleting blog:", err);
-        toast({
-          title: "Error",
-          description: "Failed to delete blog. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
+    setSelectedBlogId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`${API_URL}/events/${selectedBlogId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast({
+        title: "Success",
+        description: "Blog deleted successfully.",
+        variant: "success"
+      });
+      setBlogs(prevBlogs => prevBlogs.filter(blog => blog.id !== selectedBlogId));
+      fetchBlogs();
+    } catch (err) {
+      console.error("Error deleting blog:", err);
+      toast({
+        title: "Error",
+        description: "Failed to delete blog. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false)
+      setIsDeleteModalOpen(false);
+      setSelectedBlogId(null);
     }
   };
 
@@ -409,6 +426,29 @@ export default function BlogAdmin() {
           </div>
         )}
       </div>
+
+      {/* Delete Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-red-600">
+              <Trash2 className="mr-2 h-5 w-5" />
+              Delete Blog
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the blog? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
