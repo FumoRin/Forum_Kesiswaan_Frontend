@@ -13,54 +13,85 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Users, FileText, ArrowUp, Eye, ExternalLink } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   
-  // Mock data - replace with real data later
-  const stats = [
-    { 
-      title: "Total Users", 
-      value: "1,234", 
-      total_Change: "151", 
-      icon: <Users className="h-4 w-4" />, 
-      change: "+12.3%",
-      path: "/admin/users" 
-    },
-    { 
-      title: "Total Visitor", 
-      value: "5,845", 
-      total_Change: "781", 
-      icon: <Eye className="h-4 w-4" />, 
-      change: "+2.6%",
-      path: "/admin/visitors" 
-    },
-    { 
-      title: "Total Blog Posts", 
-      value: "567", 
-      total_Change: "21", 
-      icon: <FileText className="h-4 w-4" />, 
-      change: "+4.1%",
-      path: "/admin/blogs" 
-    },
-  ];
-
-  const recentPosts = [
-    { id: 1, title: "Getting Started with React", author: "John Doe", instansi: "SMKN 1 Cimahi", tipe_acara: "Festival", date: "2024-03-15" },
-    { id: 2, title: "Web Development Best Practices", author: "Jane Smith", instansi: "SMKN 1 Cimahi", tipe_acara: "Festival", date: "2024-03-14" },
-    { id: 3, title: "Introduction to TypeScript", author: "Mike Johnson", instansi: "SMKN 1 Cimahi", tipe_acara: "Festival", date: "2024-03-13" },
-  ];
-
-  // Simulate loading state
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          throw new Error('Authentication required');
+        }
+        
+        const response = await axios.get(`http://localhost:3000/stats/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        setDashboardData(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDashboardData();
   }, []);
   
   // Function to handle navigation
   const handleNavigation = (path) => {
     navigate(path);
+  };
+  
+  // Process stats data for display
+  const getStatsData = () => {
+    if (!dashboardData) {
+      return [
+        { title: "Total Users", value: "0", total_Change: "0", icon: <Users className="h-4 w-4" />, change: "0%", path: "/admin/users" },
+        { title: "Total Visitor", value: "0", total_Change: "0", icon: <Eye className="h-4 w-4" />, change: "0%", path: "/admin/visitors" },
+        { title: "Total Blog Posts", value: "0", total_Change: "0", icon: <FileText className="h-4 w-4" />, change: "0%", path: "/admin/blogs" }
+      ];
+    }
+    
+    return [
+      { 
+        title: "Total Users", 
+        value: dashboardData.stats.users.total.toLocaleString(), 
+        total_Change: dashboardData.stats.users.change.toLocaleString(), 
+        icon: <Users className="h-4 w-4" />, 
+        change: `+${dashboardData.stats.users.percentChange}%`,
+        path: "/admin/users" 
+      },
+      { 
+        title: "Total Visitor", 
+        value: dashboardData.stats.visitors.total.toLocaleString(), 
+        total_Change: dashboardData.stats.visitors.change.toLocaleString(), 
+        icon: <Eye className="h-4 w-4" />, 
+        change: `+${dashboardData.stats.visitors.percentChange}%`,
+        path: "/admin/visitors" 
+      },
+      { 
+        title: "Total Blog Posts", 
+        value: dashboardData.stats.posts.total.toLocaleString(), 
+        total_Change: dashboardData.stats.posts.change.toLocaleString(), 
+        icon: <FileText className="h-4 w-4" />, 
+        change: `+${dashboardData.stats.posts.percentChange}%`,
+        path: "/admin/blogs" 
+      },
+    ];
   };
 
   return (
@@ -76,10 +107,17 @@ export default function AdminDashboard() {
       <hr className="my-4 border-t" />
 
       <h1 className="text-3xl font-bold pb-4">Admin Dashboard</h1>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          Error loading dashboard data: {error}
+        </div>
+      )}
+      
       <div className="space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {stats.map((stat, index) => (
+          {getStatsData().map((stat, index) => (
             <Card key={index} className="p-6">
               <div className="flex justify-between items-center">
                 <div className="w-full">
@@ -147,7 +185,7 @@ export default function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  {['Title', 'Author', 'Instansi', 'Tipe Acara', 'Date', 'Action'].map((header) => (
+                  {['Title', 'Instansi', 'Tipe Acara', 'Date', 'Status', 'Action'].map((header) => (
                     <TableHead key={header}>
                       {isLoading ? <Skeleton className="h-4 w-[100px]" /> : header}
                     </TableHead>
@@ -169,18 +207,26 @@ export default function AdminDashboard() {
                   ))
                 ) : (
                   // Actual Data Rows
-                  recentPosts.map((post, index) => (
-                    <TableRow key={index}>
+                  dashboardData?.recentPosts?.map((post) => (
+                    <TableRow key={post.id}>
                       <TableCell className="font-medium">{post.title}</TableCell>
-                      <TableCell>{post.author}</TableCell>
                       <TableCell>{post.instansi}</TableCell>
                       <TableCell>{post.tipe_acara}</TableCell>
-                      <TableCell>{post.date}</TableCell>
+                      <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          post.status === 'published' ? 'bg-green-100 text-green-800' : 
+                          post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {post.status}
+                        </span>
+                      </TableCell>
                       <TableCell>
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          onClick={() => handleNavigation(`/admin/blog-posts/${post.id}`)}
+                          onClick={() => handleNavigation(`/admin/events/${post.id}`)}
                         >
                           View
                         </Button>
@@ -195,4 +241,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-};
+}
