@@ -85,15 +85,13 @@ const Homepage = () => {
         </div>
       </ParallaxLayer>
 
-      {/* ----------------- Page 3 (Empty) ----------------- */}
-      <ParallaxLayer offset={2} speed={0} factor={0} style={{ zIndex: 40 }}/>
 
       {/* ----------------- Search Section ----------------- */}
       <ParallaxLayer 
-        offset={3} 
+        offset={2} 
         speed={0} 
         style={{ zIndex: 40 }}
-        className="bg-white flex items-center justify-center min-h-screen"
+        className="bg-transparent flex items-center justify-center min-h-[50vh]"
       >
         <div className="w-full max-w-6xl mx-auto py-20 px-4">
           <Card className="rounded-lg shadow-xl">
