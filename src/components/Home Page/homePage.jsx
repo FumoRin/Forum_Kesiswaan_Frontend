@@ -1,4 +1,7 @@
+import React, { useEffect, useRef } from "react";
 import { Parallax, ParallaxLayer } from '@react-spring/parallax';
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,35 +13,38 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Search, Calendar, Building, Tag } from "lucide-react";
-import home1 from "../../assets/home1.jpg";
-import home2 from "../../assets/home2.jpg";
-import home3 from "../../assets/home3.jpg";
+import langit from "../../assets/Langit.png";
+import aula from "../../assets/Aula.png";
+import jalan from "../../assets/Jalan.png";
+import daun from "../../assets/Daun.png";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Homepage = () => {
+
   return (
     <Parallax pages={4} className="relative">
       {/* ----------------- Background Layers ----------------- */}
       {/* Halaman 1 */}
       <ParallaxLayer
         offset={0} // Mulai dari halaman 1
-        speed={-0.2}
+        speed={-0.5}
         factor={1} // Mengisi 1 halaman penuh
-        z-index={30}
         style={{
-          backgroundImage: `url(${home1})`,
+          zIndex: 10,
+          backgroundImage: `url(${langit})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
       
-      {/* Halaman 2 */}
       <ParallaxLayer
-        offset={1} // Mulai dari halaman 2
-        speed={0}
+        offset={0} // Mulai dari halaman 2
+        speed={-0.2}
         factor={1}
         style={{
           zIndex: 20,
-          backgroundImage: `url(${home2})`,
+          backgroundImage: `url(${aula})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -46,22 +52,22 @@ const Homepage = () => {
       
       {/* Halaman 3 */}
       <ParallaxLayer
-        offset={2} // Mulai dari halaman 3
-        speed={-0.2}
+        offset={0} // Mulai dari halaman 3
+        speed={0.5}
         factor={1}
-        z-index={10}
         style={{
-          backgroundImage: `url(${home3})`,
+          zIndex: 30,
+          backgroundImage: `url(${daun})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
 
       {/* ----------------- Page 1 Content ----------------- */}
-      <ParallaxLayer offset={0} speed={0} factor={1} style={{ zIndex: 40 }} className="flex items-center justify-center">
+      <ParallaxLayer offset={0} speed={0} factor={1} style={{ zIndex: 50 }} className="flex items-center justify-center bg-black/50">
         <div className="container mx-auto px-4 md:px-8 text-left space-y-14">
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-7xl font-bold text-[#DF2E38]">
+            <h1 className="text-5xl md:text-7xl font-bold text-white">
               Forum Kesiswaan Cimahi
             </h1>
             <p className="text-xl md:text-2xl text-[#DF2E38] max-w-2xl">
@@ -75,8 +81,8 @@ const Homepage = () => {
       </ParallaxLayer>
 
       {/* ----------------- Page 2 Content ----------------- */}
-      <ParallaxLayer offset={1} speed={0} style={{ zIndex: 40 }} className="flex items-center bg-black/50 p-8">
-        <div className="container mx-auto text-white">
+      <ParallaxLayer offset={1} speed={0} style={{ zIndex: 40 }} className="flex items-center bg-white p-8">
+        <div className="container mx-auto text-black">
           <h2 className="text-4xl font-bold mb-6">Tentang Kami</h2>
           <p className="text-lg max-w-2xl">
             Platform kolaboratif untuk seluruh siswa se-Kota Cimahi. Temukan berbagai 
