@@ -34,6 +34,7 @@ import BlogContentEditor from './BlogContentEditor';
 import BlogGalleryManager from './BlogGalleryManager';
 import BlogSettingsPanel from './BlogSettingsPanel';
 import { useBlogSubmit } from '../hooks/useBlogSubmit';
+import { toast } from "@/hooks/use-toast";
 
 const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
   const navigate = useNavigate();
@@ -55,9 +56,19 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
   const [activeTab, setActiveTab] = useState("content");
   const [previewContent, setPreviewContent] = useState('');
 
-  const { token } = useAuth(); // Assuming you have an auth context
+  const { token } = useAuth();
 
-  const { handleSubmit: handleFormSubmit, isLoading } = useBlogSubmit(token, isEditMode, onSubmit);
+  const { handleSubmit, isLoading, error } = useBlogSubmit(token, isEditMode, (responseData) => {
+    if (onSubmit) {
+      onSubmit(responseData);
+    }
+    
+    toast({
+      title: "Success",
+      description: isEditMode ? "Blog updated successfully" : "Blog created successfully",
+      variant: "success"
+    });
+  });
 
   const editor = useEditor({
     extensions: [
@@ -160,6 +171,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       return;
     }
     setSelectedDate(date);
+
     const day = date.getDate();
     const monthNames = [
       'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -168,7 +180,14 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
     const formattedDate = `${day} ${month} ${year}`;
-    setFormData(prev => ({ ...prev, date: formattedDate }));
+    
+    // Also store ISO date format to ensure correct data submission
+    const isoDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
+    setFormData(prev => ({ 
+      ...prev, 
+      date: formattedDate,
+      dateISO: isoDate
+    }));
   };
 
   const handleGalleryChange = (e) => {
@@ -224,9 +243,51 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     };
   }, [formData.gallery, formData.thumbnail]);
 
+  const handleFormSubmission = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.title || !formData.content) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!formData.dateISO && !formData.date) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a valid date",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const submissionData = { 
+      ...formData, 
+      status: formData.status || 'published'
+    };
+    
+    try {
+      await handleSubmit(submissionData);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Error",
+        description: error.message || "There was a problem saving your blog.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="md:px-6">
-      <form id="blog-form" onSubmit={(e) => { e.preventDefault(); handleFormSubmit(formData, formData.status); }} className="space-y-6">
+      <form 
+        id="blog-form" 
+        onSubmit={handleFormSubmission} 
+        className="space-y-6"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <BlogContentEditor
@@ -262,29 +323,15 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
             Cancel
           </Button>
           <Button
-            type="button"
-            variant="secondary"
-            onClick={() => handleFormSubmit(formData, 'draft')}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <span className="spinner mr-2"></span> Saving Draft...
-              </>
-            ) : (
-              'Save as Draft'
-            )}
-          </Button>
-          <Button
             type="submit"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <span className="spinner mr-2"></span> Publishing...
+                <span className="spinner mr-2"></span> Saving...
               </>
             ) : (
-              isEditMode ? 'Update Post' : 'Publish'
+              'Save'
             )}
           </Button>
         </div>

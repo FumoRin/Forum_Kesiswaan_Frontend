@@ -159,91 +159,8 @@ export default function BlogAdmin() {
   };
 
   const handleFormSubmit = async (formData) => {
-    setLoading(true);
-    try {
-      let response;
-      
-      // Create a FormData object for file uploads
-      const formDataObj = new FormData();
-      formDataObj.append('title', formData.title);
-      formDataObj.append('school', formData.school);
-      formDataObj.append('event', formData.event);
-      formDataObj.append('date', formData.date);
-      formDataObj.append('content', formData.content);
-      formDataObj.append('status', formData.status);
-      
-      // Handle thumbnail upload
-      if (formData.thumbnail?.file) {
-        formDataObj.append('thumbnail', formData.thumbnail.file);
-      }
-      
-      // Handle gallery uploads
-      if (formData.gallery && formData.gallery.length > 0) {
-        formData.gallery.forEach((item, index) => {
-          if (item.file) {
-            formDataObj.append('gallery', item.file);
-          }
-        });
-      }
-      
-      if (formMode === 'add') {
-        response = await axios.post(`${API_URL}/events`, formDataObj, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setBlogs(prev => [...prev, {
-          id: response.data.id.toString(),
-          title: response.data.title,
-          school: response.data.school,
-          event: response.data.event,
-          date: response.data.date,
-          content: response.data.content,
-          status: response.data.status,
-          thumbnail: response.data.thumbnail,
-          gallery: response.data.gallery || []
-        }]);
-        toast({
-          title: "Success",
-          description: "Blog created successfully",
-        });
-      } else {
-        response = await axios.put(`${API_URL}/events/${formData.id}`, formDataObj, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`
-          }
-        });
-        setBlogs(prev => prev.map(blog => 
-          blog.id === formData.id ? {
-            id: response.data.id.toString(),
-            title: response.data.title,
-            school: response.data.school,
-            event: response.data.event,
-            date: response.data.date,
-            content: response.data.content,
-            status: response.data.status,
-            thumbnail: response.data.thumbnail,
-            gallery: response.data.gallery || []
-          } : blog
-        ));
-        toast({
-          title: "Success",
-          description: "Blog updated successfully",
-        });
-      }
-      setShowForm(false);
-    } catch (err) {
-      console.error("Error submitting blog:", err);
-      toast({
-        title: "Error",
-        description: "Failed to save blog. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    // We should not be calling this directly - the useBlogSubmit hook should handle submission
+    console.log("WARNING: handleFormSubmit called directly. This should not happen.");
   };
 
   const handleFormCancel = () => {
@@ -284,7 +201,45 @@ export default function BlogAdmin() {
           <div className="bg-white rounded-lg pt-6">
             <BlogForm 
               blog={currentBlog} 
-              onSubmit={handleFormSubmit} 
+              onSubmit={(responseData) => {
+                // This receives response data from the API after successful submission
+                console.log("Form submission success:", responseData);
+                
+                // Update local state with new or updated blog
+                if (formMode === 'add') {
+                  setBlogs(prev => [...prev, {
+                    id: responseData.id.toString(),
+                    title: responseData.title,
+                    school: responseData.school,
+                    event: responseData.event,
+                    date: responseData.date,
+                    content: responseData.content,
+                    status: responseData.status,
+                    thumbnail: responseData.thumbnail,
+                    gallery: responseData.gallery ? (typeof responseData.gallery === 'string' ? JSON.parse(responseData.gallery) : responseData.gallery) : []
+                  }]);
+                } else {
+                  setBlogs(prev => prev.map(blog => 
+                    blog.id === responseData.id.toString() ? {
+                      id: responseData.id.toString(),
+                      title: responseData.title,
+                      school: responseData.school,
+                      event: responseData.event,
+                      date: responseData.date,
+                      content: responseData.content,
+                      status: responseData.status,
+                      thumbnail: responseData.thumbnail,
+                      gallery: responseData.gallery ? (typeof responseData.gallery === 'string' ? JSON.parse(responseData.gallery) : responseData.gallery) : []
+                    } : blog
+                  ));
+                }
+                
+                // Close the form after successful submission
+                setShowForm(false);
+                
+                // Refresh blog list to ensure we have the latest data
+                fetchBlogs();
+              }} 
               onCancel={handleFormCancel} 
               mode={formMode}
             />
@@ -352,6 +307,7 @@ export default function BlogAdmin() {
                 <SelectItem value="festival">Festival</SelectItem>
                 <SelectItem value="olimpiade">Olimpiade</SelectItem>
                 <SelectItem value="kompetisi">Kompetisi</SelectItem>
+                <SelectItem value="pengumuman">Pengumuman</SelectItem>
               </SelectContent>
             </Select>
 

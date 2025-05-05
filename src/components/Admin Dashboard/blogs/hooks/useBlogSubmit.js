@@ -7,7 +7,7 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (formData, submittedStatus) => {
+  const handleSubmit = async (formData, submittedStatus = "published") => {
     setIsLoading(true);
     setError(null);
 
@@ -18,9 +18,58 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
       formDataObj.append("title", formData.title);
       formDataObj.append("school", formData.school);
       formDataObj.append("event", formData.event);
-      formDataObj.append("date", formData.date);
+
+      // Ensure proper date format (YYYY-MM-DD) for MySQL date field
+      if (formData.dateISO) {
+        formDataObj.append("date", formData.dateISO);
+      } else if (formData.date) {
+        // Try to convert the date string to ISO format if possible
+        try {
+          const parts = formData.date.split(" ");
+          if (parts.length === 3) {
+            const months = {
+              Januari: "01",
+              Februari: "02",
+              Maret: "03",
+              April: "04",
+              Mei: "05",
+              Juni: "06",
+              Juli: "07",
+              Agustus: "08",
+              September: "09",
+              Oktober: "10",
+              November: "11",
+              Desember: "12",
+            };
+            const day = parseInt(parts[0]).toString().padStart(2, "0");
+            const month = months[parts[1]];
+            const year = parts[2];
+            if (day && month && year) {
+              formDataObj.append("date", `${year}-${month}-${day}`);
+            } else {
+              formDataObj.append("date", formData.date);
+            }
+          } else {
+            formDataObj.append("date", formData.date);
+          }
+        } catch (e) {
+          console.error("Error parsing date:", e);
+          formDataObj.append("date", formData.date);
+        }
+      } else {
+        // If no date provided, use current date
+        const today = new Date();
+        const isoDate = today.toISOString().split("T")[0];
+        formDataObj.append("date", isoDate);
+      }
+
       formDataObj.append("content", formData.content);
-      formDataObj.append("status", submittedStatus);
+
+      // Ensure status is always set with a default if not provided
+      formDataObj.append(
+        "status",
+        submittedStatus || formData.status || "published"
+      );
 
       // Handle thumbnail file or existing URL
       if (formData.thumbnail?.file) {
@@ -92,7 +141,7 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
         err.message ||
         "An unexpected error occurred.";
       setError(errorMessage);
-      alert(`Error: ${errorMessage}`); // Keep basic alert for now
+      throw new Error(errorMessage); // Throw to prevent any continuation that might cause double submission
     } finally {
       setIsLoading(false);
     }
