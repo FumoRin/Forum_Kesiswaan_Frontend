@@ -5,3 +5,7 @@
   padding: 0;
 }
 
+html,
+body {
+  background-color: #787fd2; /* Sky blue color to match the langit (sky) image */
+}
