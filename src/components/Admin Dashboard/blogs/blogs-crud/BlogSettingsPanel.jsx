@@ -22,8 +22,7 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
     if (typeof formData.thumbnail === 'string') return formData.thumbnail;
     // If thumbnail is an object with a URL (likely from file selection or updated blog data)
     if (typeof formData.thumbnail === 'object' && formData.thumbnail.url) return formData.thumbnail.url;
-    // Add more checks if your structure can be different
-    return null; // Fallback
+    return null;
   };
 
   const thumbnailSrc = getThumbnailSrc();
@@ -46,7 +45,7 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
               <Select
                 value={formData.status}
                 onValueChange={(value) => handleSelectChange('status', value)}
-                required // Added required attribute to match input fields
+                required
               >
                 <SelectTrigger id="status" className="bg-white">
                   <SelectValue placeholder="Select status" />
@@ -120,15 +119,23 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
               <Label htmlFor="event" className="flex items-center gap-2">
                 <Award size={16} /> Event <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="event"
-                name="event"
+              <Select
                 value={formData.event}
-                onChange={handleChange}
-                placeholder="Enter event name"
+                onValueChange={(value) => handleSelectChange('event', value)}
                 required
-                className="bg-white"
-              />
+              >
+                <SelectTrigger id="event" className="bg-white">
+                  <SelectValue placeholder="Select event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Semua">Semua</SelectItem>
+                  <SelectItem value="Pengumuman">Pengumuman</SelectItem>
+                  <SelectItem value="Lomba">Perlombaan</SelectItem>
+                  <SelectItem value="Festival">Festival</SelectItem>
+                  <SelectItem value="Olimpiade">Olimpiade</SelectItem>
+                  <SelectItem value="Kompetisi">Kompetisi</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">

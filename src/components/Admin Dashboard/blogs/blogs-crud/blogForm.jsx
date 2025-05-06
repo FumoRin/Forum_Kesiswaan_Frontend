@@ -112,12 +112,58 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     if (editor && blog) {
       editor.commands.setContent(blog.content || '');
       setPreviewContent(blog.content || '');
+
+      let formattedDate = blog?.date || '';
+      let dateObj = null;
+      
+      if (formattedDate) {
+        // Try to detect the date format and convert appropriately
+        if (/^\d{4}-\d{2}-\d{2}/.test(formattedDate)) {
+          try {
+            dateObj = new Date(formattedDate);
+            if (!isNaN(dateObj.getTime())) {
+              const day = dateObj.getDate();
+              const monthNames = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+              ];
+              const month = monthNames[dateObj.getMonth()];
+              const year = dateObj.getFullYear();
+              formattedDate = `${day} ${month} ${year}`;
+            }
+          } catch (e) {
+            console.error('Error parsing date:', e);
+          }
+        } else if (formattedDate.split(' ').length === 3) {
+          // Already in DD Month YYYY format, just update the dateObj
+          try {
+            const parts = formattedDate.split(' ');
+            const months = {
+              'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3,
+              'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7,
+              'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+            };
+            const day = parseInt(parts[0]);
+            const month = months[parts[1]];
+            const year = parseInt(parts[2]);
+            if (!isNaN(day) && month !== undefined && !isNaN(year)) {
+              dateObj = new Date(year, month, day);
+            }
+          } catch (e) {
+            console.error('Error parsing date in DD Month YYYY format:', e);
+          }
+        }
+      }
+      
+      setSelectedDate(dateObj);
+      
       setFormData({
         id: blog?.id || '',
         title: blog?.title || '',
         school: blog?.school || '',
         event: blog?.event || '',
-        date: blog?.date || '',
+        date: formattedDate,
+        dateISO: blog?.date && /^\d{4}-\d{2}-\d{2}/.test(blog.date) ? blog.date : dateObj ? dateObj.toISOString().split('T')[0] : '',
         content: blog?.content || '',
         status: blog?.status || 'draft',
         gallery: blog?.gallery?.map(item => typeof item === 'string' ? { original: item, thumbnail: item } : item) || [],
