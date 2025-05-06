@@ -10,14 +10,52 @@ import { Search, File, Building, Calendar } from "lucide-react";
 import axios from 'axios';
 import { useToast } from "@/hooks/use-toast";
 
-const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
-  const [isLoading, setIsLoading] = useState(true);
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
   
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  
+  return `${day}-${month}-${year}`;
+};
 
+// Dedicated skeleton component for consistency
+const SkeletonCard = () => {
+  return (
+    <Card className="overflow-hidden">
+      <div className="h-40 bg-gray-200">
+        <Skeleton className="w-full h-full" />
+      </div>
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-[200px]" />
+      </CardHeader>
+      <CardContent className="pb-2">
+        <div className="flex flex-col space-y-1 text-sm">
+          <div className="text-gray-700 flex items-center gap-2">
+            <Building size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </div>
+          <p className="text-gray-700 flex items-center gap-2">
+            <File size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </p>
+          <p className="text-gray-700 flex items-center gap-2">
+            <Calendar size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </p>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-8 w-full" />
+      </CardFooter>
+    </Card>
+  );
+};
+
+const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
   return (
     <Card className="overflow-hidden">
       <div className="h-40 bg-gray-200 overflow-hidden">
@@ -34,59 +72,30 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
         )}
       </div>
       <CardHeader className="pb-2">
-        {isLoading ? (
-          <Skeleton className="h-6 w-[200px]" />
-        ) : (
-          <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
-        )}
+        <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex flex-col space-y-1 text-sm">
           <div className="text-gray-700 flex items-center gap-2">
             <Building size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Sekolah:</span> {school}
-              </>
-            )}
+            <span className="font-medium">Sekolah:</span> {school}
           </div>
           <p className="text-gray-700 flex items-center gap-2">
             <File size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Acara:</span> {event}
-              </>
-            )}
+            <span className="font-medium">Acara:</span> {event}
           </p>
           <p className="text-gray-700 flex items-center gap-2">
             <Calendar size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-              <span className="font-medium">Tanggal:</span> {date}
-              </>
-            )}
-            
+            <span className="font-medium">Tanggal:</span> {formatDate(date)}
           </p>
         </div>
       </CardContent>
       <CardFooter>
-        {isLoading ? (
-          <Skeleton className="h-8 w-full" />
-          ) : (
-            <>
-              <Button variant="outline" className="w-full" asChild>
-                <Link to={`/blog/${id}`}>
-                  Lihat Detail
-                </Link>
-              </Button>
-            </>
-        )}
+        <Button variant="outline" className="w-full" asChild>
+          <Link to={`/blog/${id}`}>
+            Lihat Detail
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );
@@ -100,6 +109,7 @@ const SearchResults = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -115,9 +125,12 @@ const SearchResults = () => {
           title: "Error",
           description: "Failed to fetch events. Please try again later.",
           variant: "destructive"
-        })
+        });
       } finally {
-        setLoading(false);
+        // Add a small delay to ensure skeleton is shown properly
+        setTimeout(() => {
+          setLoading(false);
+        }, 200);
       }
     };
 
@@ -126,6 +139,11 @@ const SearchResults = () => {
 
   // Filter events based on search query and filters
   const filteredEvents = events.filter(event => {
+    // Only show published events to the public
+    if (event.status !== "published") {
+      return false;
+    }
+    
     // Filter by search query
     const matchesQuery = searchQuery === '' || 
       event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -141,27 +159,36 @@ const SearchResults = () => {
     const matchesInstitution = institution === 'all' || 
       (institution && event.school?.toLowerCase().includes(institution.toLowerCase()));
     
-    // Filter by date (simplified version - can be enhanced with proper date comparison)
+    // Filter by date (improved with proper date comparison)
     let matchesDate = true;
-    if (dateFilter !== 'all') {
-      const eventDate = new Date(event.date);
-      const today = new Date();
-      if (dateFilter === 'upcoming' && eventDate < today) {
-        matchesDate = false;
-      } else if (dateFilter === 'past' && eventDate >= today) {
-        matchesDate = false;
+    if (dateFilter !== 'all' && event.date) {
+      try {
+        const eventDate = new Date(event.date);
+        const today = new Date();
+        
+        // Reset time part for comparison
+        today.setHours(0, 0, 0, 0);
+        
+        if (dateFilter === 'upcoming' && eventDate < today) {
+          matchesDate = false;
+        } else if (dateFilter === 'past' && eventDate >= today) {
+          matchesDate = false;
+        }
+      } catch (err) {
+        console.error('Error comparing dates:', err);
       }
     }
     
     return matchesQuery && matchesEventType && matchesInstitution && matchesDate;
   });
+  
 
   return (
     <div className="w-full min-w-fit py-6 px-20 mt-navbar">
       {/* Search Results Header */}
       <div className="flex flex-col justify-between mb-6">
         <h2 className="text-3xl font-bold mb-4 md:mb-0"> 
-          {loading ? 'Loading...' : `${filteredEvents.length} Hasil Pencarian Ditemukan`}
+          {loading ? 'Mencari Event...' : `${filteredEvents.length} Hasil Pencarian Ditemukan`}
         </h2>
 
         <div className="flex flex-row mt-4 justify-between">
@@ -172,13 +199,14 @@ const SearchResults = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-full"
+              disabled={loading}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
 
           {/* Filters using shadcn Select */}
           <div className="justify-between flex gap-2">
-            <Select value={eventType} onValueChange={setEventType}>
+            <Select value={eventType} onValueChange={setEventType} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <File size={16} className="text-gray-500" />
@@ -191,10 +219,11 @@ const SearchResults = () => {
                 <SelectItem value="festival">Festival</SelectItem>
                 <SelectItem value="olimpiade">Olimpiade</SelectItem>
                 <SelectItem value="kompetisi">Kompetisi</SelectItem>
+                <SelectItem value="pengumuman">Pengumuman</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={institution} onValueChange={setInstitution}>
+            <Select value={institution} onValueChange={setInstitution} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <Building size={16} className="text-gray-500" />
@@ -208,7 +237,7 @@ const SearchResults = () => {
               </SelectContent>
             </Select>
 
-            <Select value={dateFilter} onValueChange={setDateFilter}>
+            <Select value={dateFilter} onValueChange={setDateFilter} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-gray-500" />
@@ -237,14 +266,7 @@ const SearchResults = () => {
         {loading ? (
           // Show skeleton loaders while loading
           Array(6).fill().map((_, index) => (
-            <ShadcnResultCard 
-              key={`skeleton-${index}`}
-              id=""
-              title=""
-              school=""
-              event=""
-              date=""
-            />
+            <SkeletonCard key={`skeleton-${index}`} />
           ))
         ) : filteredEvents.length > 0 ? (
           // Show filtered results

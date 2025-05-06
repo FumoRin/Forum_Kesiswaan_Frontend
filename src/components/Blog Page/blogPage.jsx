@@ -31,6 +31,20 @@ const BlogPage = () => {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { toast } = useToast();
+
+  // Function to format ISO date to YYYY-MM-DD
+  const formatDate = (isoDate) => {
+    if (!isoDate) return '';
+    
+    try {
+      // Extract just the YYYY-MM-DD portion from the ISO date string
+      return isoDate.split('T')[0];
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return isoDate; // Return original if parsing fails
+    }
+  };
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -194,7 +208,7 @@ const BlogPage = () => {
                   </Badge>
                   <Badge variant="outline" className="flex items-center gap-1 px-3 py-1">
                     <Calendar className="w-4 h-4" />
-                    <span>{blog.date}</span>
+                    <span>{blog.date ? formatDate(blog.date) : ''}</span>
                   </Badge>
                 </div>
                 

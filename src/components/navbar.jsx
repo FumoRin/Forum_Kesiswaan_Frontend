@@ -72,12 +72,6 @@ const Navbar = () => {
               >
                 Blogs
               </Link>
-              <Link
-                to="/about/stats"
-                className="text-white hover:text-[#DF2E38] transition-colors duration-300"
-              >
-                Visitor Stats
-              </Link>
             </>
           )
         }

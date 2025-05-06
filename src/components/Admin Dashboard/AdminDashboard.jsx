@@ -76,14 +76,6 @@ export default function AdminDashboard() {
         path: "/admin/users" 
       },
       { 
-        title: "Total Visitor", 
-        value: dashboardData.stats.visitors.total.toLocaleString(), 
-        total_Change: dashboardData.stats.visitors.change.toLocaleString(), 
-        icon: <Eye className="h-4 w-4" />, 
-        change: `+${dashboardData.stats.visitors.percentChange}%`,
-        path: "/admin/visitors" 
-      },
-      { 
         title: "Total Blog Posts", 
         value: dashboardData.stats.posts.total.toLocaleString(), 
         total_Change: dashboardData.stats.posts.change.toLocaleString(), 
@@ -116,7 +108,7 @@ export default function AdminDashboard() {
       
       <div className="space-y-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {getStatsData().map((stat, index) => (
             <Card key={index} className="p-6">
               <div className="flex justify-between items-center">
