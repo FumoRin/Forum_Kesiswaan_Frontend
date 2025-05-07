@@ -11,7 +11,7 @@ RUN npm install
 # --- Build Stage ---
 FROM dependencies AS build
 COPY . .
-run npm run build
+RUN npm run build
 
 # --- Production ---
 FROM nginx:stable-alpine AS production
