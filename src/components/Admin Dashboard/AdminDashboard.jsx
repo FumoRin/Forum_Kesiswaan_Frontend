@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, ArrowUp, Eye, ExternalLink } from "lucide-react";
+import { Users, FileText, ArrowUp, Eye, ExternalLink, ArrowDown } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -58,30 +58,35 @@ export default function AdminDashboard() {
   
   // Process stats data for display
   const getStatsData = () => {
-    if (!dashboardData) {
+    if (!dashboardData || !dashboardData.stats) {
       return [
-        { title: "Total Users", value: "0", total_Change: "0", icon: <Users className="h-4 w-4" />, change: "0%", path: "/admin/users" },
-        { title: "Total Visitor", value: "0", total_Change: "0", icon: <Eye className="h-4 w-4" />, change: "0%", path: "/admin/visitors" },
-        { title: "Total Blog Posts", value: "0", total_Change: "0", icon: <FileText className="h-4 w-4" />, change: "0%", path: "/admin/blogs" }
+        { title: "Total Users", value: "0", total_Change: "0", icon: <Users className="h-4 w-4" />, change: "0%", path: "/admin/users", isPositive: true },
+        { title: "Total Blog Posts", value: "0", total_Change: "0", icon: <FileText className="h-4 w-4" />, change: "0%", path: "/admin/blogs", isPositive: true }
       ];
     }
+    
+    // Extract stats safely
+    const usersStats = dashboardData.stats.users || { total: 0, change: 0, percentChange: 0, isPositive: true };
+    const postsStats = dashboardData.stats.posts || { total: 0, change: 0, percentChange: 0, isPositive: true };
     
     return [
       { 
         title: "Total Users", 
-        value: dashboardData.stats.users.total.toLocaleString(), 
-        total_Change: dashboardData.stats.users.change.toLocaleString(), 
+        value: String(usersStats.total || 0), 
+        total_Change: String(Math.abs(usersStats.change || 0)), 
         icon: <Users className="h-4 w-4" />, 
-        change: `+${dashboardData.stats.users.percentChange}%`,
-        path: "/admin/users" 
+        change: `${usersStats.isPositive ? '+' : '-'}${Math.abs(usersStats.percentChange || 0)}%`,
+        path: "/admin/users",
+        isPositive: usersStats.isPositive
       },
       { 
         title: "Total Blog Posts", 
-        value: dashboardData.stats.posts.total.toLocaleString(), 
-        total_Change: dashboardData.stats.posts.change.toLocaleString(), 
+        value: String(postsStats.total || 0), 
+        total_Change: String(Math.abs(postsStats.change || 0)), 
         icon: <FileText className="h-4 w-4" />, 
-        change: `+${dashboardData.stats.posts.percentChange}%`,
-        path: "/admin/blogs" 
+        change: `${postsStats.isPositive ? '+' : '-'}${Math.abs(postsStats.percentChange || 0)}%`,
+        path: "/admin/blogs",
+        isPositive: postsStats.isPositive
       },
     ];
   };
@@ -137,8 +142,14 @@ export default function AdminDashboard() {
                   <Skeleton className="h-4 w-[60px]" />
                 ) : (
                   <div className="flex flex-col items-end gap-2">
-                    <div className="flex items-center gap-1 text-sm text-green-600">
-                      <ArrowUp className="h-4 w-4" />
+                    <div className={`flex items-center gap-1 text-sm ${
+                      stat.isPositive ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {stat.isPositive ? (
+                        <ArrowUp className="h-4 w-4" />
+                      ) : (
+                        <ArrowDown className="h-4 w-4" />
+                      )}
                       {stat.change}
                     </div>
                     <Button 
