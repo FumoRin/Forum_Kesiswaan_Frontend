@@ -310,13 +310,10 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       return;
     }
     
-    const submissionData = { 
-      ...formData, 
-      status: formData.status || 'published'
-    };
-    
+    // Keep the user's selected status without overriding it
     try {
-      await handleSubmit(submissionData);
+      // Pass the unmodified formData - don't force a status
+      await handleSubmit(formData);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({

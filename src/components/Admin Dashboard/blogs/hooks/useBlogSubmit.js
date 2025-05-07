@@ -7,7 +7,7 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = async (formData, submittedStatus = "published") => {
+  const handleSubmit = async (formData, submittedStatus = null) => {
     setIsLoading(true);
     setError(null);
 
@@ -65,7 +65,8 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
 
       formDataObj.append("content", formData.content);
 
-      // Ensure status is always set with a default if not provided
+      // Ensure status is preserved from the form data, falling back to defaults only if necessary
+      // Priority: 1. submittedStatus (if provided), 2. formData.status, 3. "published" as last resort
       formDataObj.append(
         "status",
         submittedStatus || formData.status || "published"
