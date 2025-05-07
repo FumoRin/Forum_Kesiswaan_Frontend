@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,43 +6,28 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, File, Building, Plus, ArrowLeft } from "lucide-react";
+import { Search, File, Building, Plus, ArrowLeft, Trash2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import axios from 'axios';
 
 import BlogCard from "./blogCard";
 import BlogForm from "./blogs-crud/blogForm";
-import thumbnailBlog from "../../../assets/thumbnail.jpg";
-
-// Sample data
-const sampleResults = [
-  {
-    id: '1',
-    title: 'Lomba Kebersihan Antar Sekolah',
-    school: 'SMK Negeri 1 Cimahi',
-    event: 'Lomba WS Terbersih',
-    date: '16 Agustus 2024',
-    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nisl risus, sodales eu sem vel, fermentum suscipit justo. Nam ut ex ut orci placerat ultrices non vel quam. Aenean ac nisi vitae felis eleifend lobortis. Donec convallis fermentum arcu, eu maximus ex facilisis quis. Vivamus vitae dui ut ex convallis aliquam ultricies sit amet dui. Vivamus sed laoreet diam, non auctor arcu. Sed sodales quam id semper tincidunt. Phasellus lobortis porta faucibus. Vestibulum eu mauris urna. </p><p>Lomba ini melibatkan seluruh jurusan di sekolah dengan kriteria penilaian meliputi:</p><ul><li>Kebersihan</li><li>Kerapihan</li><li>Kreativitas dalam mendekorasi ruang belajar</li><li>Kebersihan kamar mandi</li></ul><p>Pemenang akan diumumkan pada akhir lomba dan diberikan penghargaan berupa piala untuk juara 1, 2, dan 3.</p><img src="https://picsum.photos/id/1018/800/600" alt="Dokumentasi Lomba" />',
-    status: 'published',
-    thumbnail: thumbnailBlog,
-    gallery: [
-      {
-        original: 'https://picsum.photos/id/1018/800/600',
-        thumbnail: 'https://picsum.photos/id/1018/200/150',
-      },
-      {
-        original: 'https://picsum.photos/id/1025/800/600',
-        thumbnail: 'https://picsum.photos/id/1025/200/150',
-      },
-    ],
-  },
-  // ... other sample data
-];
+import { useAuth } from "@/components/utils/authProvider";
 
 export default function BlogAdmin() {
-  const [blogs, setBlogs] = useState(sampleResults);
+  const [blogs, setBlogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [eventType, setEventType] = useState('');
   const [institution, setInstitution] = useState('');
@@ -50,9 +35,59 @@ export default function BlogAdmin() {
   
   const [showForm, setShowForm] = useState(false);
   const [currentBlog, setCurrentBlog] = useState(null);
-  const [formMode, setFormMode] = useState('add'); // 'add' or 'edit'
+  const [formMode, setFormMode] = useState('add'); 
   
   const [activeTab, setActiveTab] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedBlogId, setSelectedBlogId] = useState(null);
+  
+  const { toast } = useToast();
+  const { token } = useAuth();
+
+  const API_URL = "http://localhost:3000";
+
+  // Fetch blogs from API
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/events`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      // Convert the API response to match expected blog format
+      const formattedBlogs = response.data.map(event => ({
+        id: event.id.toString(),
+        title: event.title,
+        school: event.school,
+        event: event.event,
+        date: event.date,
+        content: event.content,
+        status: event.status,
+        thumbnail: event.thumbnail,
+        gallery: event.gallery ? JSON.parse(event.gallery) : []
+      }));
+      setBlogs(formattedBlogs);
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+      setError("Failed to load blogs. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to load blogs. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter blogs based on search and filters
   const filteredBlogs = blogs.filter(blog => {
@@ -90,21 +125,42 @@ export default function BlogAdmin() {
     setShowForm(true);
   };
 
-  const handleDeleteBlog = (id) => {
-    if (window.confirm('Are you sure you want to delete this blog?')) {
-      setBlogs(prev => prev.filter(blog => blog.id !== id));
+  const handleDeleteBlog = async (id) => {
+    setSelectedBlogId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await axios.delete(`${API_URL}/events/${selectedBlogId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      toast({
+        title: "Success",
+        description: "Blog deleted successfully.",
+        variant: "success"
+      });
+      setBlogs(prevBlogs => prevBlogs.filter(blog => blog.id !== selectedBlogId));
+      fetchBlogs();
+    } catch (err) {
+      console.error("Error deleting blog:", err);
+      toast({
+        title: "Error",
+        description: "Failed to delete blog. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false)
+      setIsDeleteModalOpen(false);
+      setSelectedBlogId(null);
     }
   };
 
-  const handleFormSubmit = (formData) => {
-    if (formMode === 'add') {
-      // Generate a simple ID for demo purposes
-      const newId = (Math.max(...blogs.map(b => parseInt(b.id))) + 1).toString();
-      setBlogs(prev => [...prev, { ...formData, id: newId }]);
-    } else {
-      setBlogs(prev => prev.map(blog => blog.id === formData.id ? formData : blog));
-    }
-    setShowForm(false);
+  const handleFormSubmit = async (formData) => {
+    // We should not be calling this directly - the useBlogSubmit hook should handle submission
+    console.log("WARNING: handleFormSubmit called directly. This should not happen.");
   };
 
   const handleFormCancel = () => {
@@ -145,7 +201,45 @@ export default function BlogAdmin() {
           <div className="bg-white rounded-lg pt-6">
             <BlogForm 
               blog={currentBlog} 
-              onSubmit={handleFormSubmit} 
+              onSubmit={(responseData) => {
+                // This receives response data from the API after successful submission
+                console.log("Form submission success:", responseData);
+                
+                // Update local state with new or updated blog
+                if (formMode === 'add') {
+                  setBlogs(prev => [...prev, {
+                    id: responseData.id.toString(),
+                    title: responseData.title,
+                    school: responseData.school,
+                    event: responseData.event,
+                    date: responseData.date,
+                    content: responseData.content,
+                    status: responseData.status,
+                    thumbnail: responseData.thumbnail,
+                    gallery: responseData.gallery ? (typeof responseData.gallery === 'string' ? JSON.parse(responseData.gallery) : responseData.gallery) : []
+                  }]);
+                } else {
+                  setBlogs(prev => prev.map(blog => 
+                    blog.id === responseData.id.toString() ? {
+                      id: responseData.id.toString(),
+                      title: responseData.title,
+                      school: responseData.school,
+                      event: responseData.event,
+                      date: responseData.date,
+                      content: responseData.content,
+                      status: responseData.status,
+                      thumbnail: responseData.thumbnail,
+                      gallery: responseData.gallery ? (typeof responseData.gallery === 'string' ? JSON.parse(responseData.gallery) : responseData.gallery) : []
+                    } : blog
+                  ));
+                }
+                
+                // Close the form after successful submission
+                setShowForm(false);
+                
+                // Refresh blog list to ensure we have the latest data
+                fetchBlogs();
+              }} 
               onCancel={handleFormCancel} 
               mode={formMode}
             />
@@ -174,7 +268,7 @@ export default function BlogAdmin() {
       <div className="flex flex-col">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Blog Admin</h1>
-          <Button onClick={handleAddBlog}>
+          <Button onClick={handleAddBlog} disabled={loading}>
             <Plus size={16} className="mr-2" /> Add Blog
           </Button>
         </div>
@@ -213,6 +307,7 @@ export default function BlogAdmin() {
                 <SelectItem value="festival">Festival</SelectItem>
                 <SelectItem value="olimpiade">Olimpiade</SelectItem>
                 <SelectItem value="kompetisi">Kompetisi</SelectItem>
+                <SelectItem value="pengumuman">Pengumuman</SelectItem>
               </SelectContent>
             </Select>
 
@@ -251,23 +346,65 @@ export default function BlogAdmin() {
           <p className="text-gray-600">{filteredBlogs.length} blogs found</p>
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && (
+          <div className="text-center py-8 text-red-500">
+            <p>{error}</p>
+            <Button onClick={fetchBlogs} variant="outline" className="mt-4">
+              Try Again
+            </Button>
+          </div>
+        )}
+
         {/* Blog cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredBlogs.map((blog) => (
-            <BlogCard 
-              key={blog.id} 
-              blog={blog} 
-              onEdit={handleEditBlog} 
-              onDelete={handleDeleteBlog} 
-            />
-          ))}
-          {filteredBlogs.length === 0 && (
-            <div className="col-span-3 py-16 text-center text-gray-500">
-              <p>No blogs found with the current filters.</p>
-            </div>
-          )}
-        </div>
+        {!loading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredBlogs.map((blog) => (
+              <BlogCard 
+                key={blog.id} 
+                blog={blog} 
+                onEdit={handleEditBlog} 
+                onDelete={handleDeleteBlog} 
+              />
+            ))}
+            {filteredBlogs.length === 0 && (
+              <div className="col-span-3 py-16 text-center text-gray-500">
+                <p>No blogs found with the current filters.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Delete Modal */}
+      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-red-600">
+              <Trash2 className="mr-2 h-5 w-5" />
+              Delete Blog
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the blog? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

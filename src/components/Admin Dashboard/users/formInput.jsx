@@ -1,20 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import AddUserForm from "./user-crud/addUser"; // Import the component we created above
 
 const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
-  const [formData, setFormData] = useState(
-    userData || {
-      email: "",
-      full_name: "",
-      no_hp: "",
-      role: "user",
-      school: "",
-    }
-  );
+  const defaultFormData = {
+    email: "",
+    full_name: "",
+    no_hp: "",
+    role: "user",
+    school: "",
+    password: "",
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
   
+  // Reset form when userData changes or dialog opens/closes
+  useEffect(() => {
+    setFormData(userData || defaultFormData);
+  }, [userData, isOpen]);
+
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
@@ -24,6 +31,10 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
       [id]: value,
     }));
   };
+
+  const toggleShowPassword = () => {
+    setShowPassword(prev => !prev);
+  }
 
   const validateForm = () => {
     const newErrors = {};
@@ -36,6 +47,10 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
     
     if (!formData.full_name) {
       newErrors.full_name = "Full name is required";
+    }
+
+    if (!userData && !formData.password) {
+      newErrors.password = "Password is required"
     }
     
     if (!formData.no_hp) {
@@ -60,7 +75,7 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md" hideCloseButton={true}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{userData ? "Edit User" : "Add New User"}</DialogTitle>
         </DialogHeader>
@@ -75,6 +90,19 @@ const UserForm = ({ isOpen, onClose, userData = null, onSubmit }) => {
             onChange={handleChange}
             required={true}
             error={errors.email}
+          />
+
+          <AddUserForm 
+            id="password"
+            label="Password"
+            placeholder="********"
+            value={formData.password}
+            onChange={handleChange}
+            required={!userData}
+            error={errors.password}
+            isPassword={true}
+            showPassword={showPassword}
+            toggleShowPassword={toggleShowPassword}
           />
           
           <AddUserForm
