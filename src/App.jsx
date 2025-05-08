@@ -13,6 +13,7 @@ import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 import UserDashboard from "./components/User Dashboard/userDashboard"
 import UserBlog from "./components/User Dashboard/userBlog"
+import AboutPage from "./components/About Page/aboutPage"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/search-results" element={<SearchResults />} />
             <Route path="/blog/:id" element={<BlogPage />} />
+            <Route path="/about" element={<AboutPage />} />
           </Route> 
           
           {/* Auth Routes - without Navbar/Footer */}
