@@ -1,22 +1,72 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Bold, Italic, Underline as UnderlineIcon, Heading2, Heading3,
   List, ListOrdered, Link as LinkIcon, Image as ImageIcon,
-  AlignLeft, AlignCenter, AlignRight, Undo, Redo,
+  AlignLeft, AlignCenter, AlignRight, Undo, Redo, Loader,
 } from 'lucide-react';
+import axios from 'axios';
+import { useAuth } from '@/components/utils/authProvider';
+import { toast } from "@/hooks/use-toast";
 
 // TipTap Toolbar Component
 const MenuBar = ({ editor }) => {
+  const imageInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const { token } = useAuth();
+
   if (!editor) {
     return null;
   }
 
-  const addImage = () => {
-    const url = window.prompt('Enter the URL of the image:');
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
+  const handleImageUpload = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      try {
+        setIsUploading(true);
+        
+        // Upload the image to server first before inserting it
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        // Using the direct endpoint matching the router definition
+        const response = await axios.post('http://localhost:3000/upload/single', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        // Get the server URL and insert it directly
+        const serverUrl = response.data.file.url;
+        
+        // Insert the image with server URL directly (no blob URL intermediary)
+        editor.chain().focus().setImage({ src: serverUrl }).run();
+        
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully",
+          variant: "success"
+        });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+          title: "Upload Error",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive"
+        });
+      } finally {
+        setIsUploading(false);
+        // Reset the file input
+        e.target.value = '';
+      }
     }
+  };
+
+  const triggerImageUpload = () => {
+    if (isUploading) return;
+    imageInputRef.current?.click();
   };
 
   const setLink = () => {
@@ -37,6 +87,15 @@ const MenuBar = ({ editor }) => {
 
   return (
     <div className="border border-gray-200 rounded-t-md p-2 flex flex-wrap gap-1 bg-white sticky top-0 z-10">
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        ref={imageInputRef}
+        onChange={handleImageUpload}
+        accept="image/*"
+        style={{ display: 'none' }}
+      />
+
       {/* Formatting Buttons */}
       <div className="flex gap-1 mr-2">
         <Button
@@ -158,10 +217,11 @@ const MenuBar = ({ editor }) => {
           type="button"
           variant="outline"
           size="icon"
-          onClick={addImage}
+          onClick={triggerImageUpload}
+          disabled={isUploading}
           title="Insert Image"
         >
-          <ImageIcon size={16} />
+          {isUploading ? <Loader size={16} className="animate-spin" /> : <ImageIcon size={16} />}
         </Button>
       </div>
 

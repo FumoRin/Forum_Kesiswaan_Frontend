@@ -63,6 +63,7 @@ export const useBlogSubmit = (token, isEditMode, onSubmitCallback) => {
         formDataObj.append("date", isoDate);
       }
 
+      // Simply append the content - all images are already uploaded and have server URLs
       formDataObj.append("content", formData.content);
 
       // Ensure status is preserved from the form data, falling back to defaults only if necessary
