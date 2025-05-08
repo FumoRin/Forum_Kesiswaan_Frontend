@@ -13,6 +13,7 @@ import UserAdmin from "./components/Admin Dashboard/users/userAdmin"
 import BlogAdmin from "./components/Admin Dashboard/blogs/blogAdmin"
 import UserDashboard from "./components/User Dashboard/userDashboard"
 import UserBlog from "./components/User Dashboard/userBlog"
+import AboutPage from "./components/About Page/aboutPage"
 
 import PrivateRoutes from "./components/utils/protectedRoutes"
 import { AuthProvider } from "./components/utils/authProvider"
@@ -28,6 +29,7 @@ function App() {
               <Route path="/" element={<Homepage />} />
               <Route path="/search-results" element={<SearchResults />} />
               <Route path="/blog/:id" element={<BlogPage />} />
+              <Route path="/about" element={<AboutPage />} />
             </Route>
       
             {/* Auth Routes - without Navbar/Footer */}
