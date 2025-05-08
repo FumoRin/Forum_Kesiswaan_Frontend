@@ -310,9 +310,8 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       return;
     }
     
-    // Keep the user's selected status without overriding it
     try {
-      // Pass the unmodified formData - don't force a status
+      // Simply pass the formData - all images are already uploaded at this point
       await handleSubmit(formData);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -323,6 +322,20 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       });
     }
   };
+
+  // Clean up only gallery and thumbnail blobs when component unmounts
+  useEffect(() => {
+    return () => {
+      formData.gallery?.forEach(item => {
+        if (item.file && item.original?.startsWith('blob:')) {
+          URL.revokeObjectURL(item.original);
+        }
+      });
+      if (formData.thumbnail?.file && formData.thumbnail.url?.startsWith('blob:')) {
+        URL.revokeObjectURL(formData.thumbnail.url);
+      }
+    };
+  }, [formData.gallery, formData.thumbnail]);
 
   return (
     <div className="md:px-6">
