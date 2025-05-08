@@ -1,14 +1,9 @@
 import { LoginForm } from "@/components/login/login-form";
-import { SignupForm } from "@/components/login/signup-form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLocation } from "react-router-dom";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import authImage from "../../assets/auth-img.jpg";
 import appLogo from "../../assets/logo.svg";
 
 export default function AuthPage() {
-  const location = useLocation();
-  const defaultTab = location.state?.tab || "login";
   return (
     <div className="grid min-h-svh lg:grid-cols-2 w-full">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -25,28 +20,11 @@ export default function AuthPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <Tabs
-              defaultValue={defaultTab}
-              className="flex flex-col min-h-[400px] relative"
-            >
-              {/* Add wrapper div with fixed height */}
-              <div className="h-[60px]">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="login">Login</TabsTrigger>
-                  <TabsTrigger value="register">Register</TabsTrigger>
-                </TabsList>
-              </div>
-
-              {/* Add padding-top to content area */}
+            <div className="flex flex-col min-h-[400px] relative">
               <div className="flex-1 overflow-auto pt-2">
-                <TabsContent value="login" className="mt-0">
-                  <LoginForm />
-                </TabsContent>
-                <TabsContent value="register" className="mt-0">
-                  <SignupForm />
-                </TabsContent>
+                <LoginForm />
               </div>
-            </Tabs>
+            </div>
           </div>
         </div>
       </div>

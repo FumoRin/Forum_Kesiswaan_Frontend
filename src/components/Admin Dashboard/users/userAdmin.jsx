@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/components/utils/authProvider";
 
 import {
   Breadcrumb,
@@ -9,134 +10,28 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 import { columns } from "./tables/column";
 import { DataTable } from "./tables/data-tables";
 import { UserPlus } from "lucide-react"; 
 
 import UserForm from "./formInput";
-import DeleteUserDialog from "./user-crud/deleteUser"; // New import
+import DeleteUserDialog from "./user-crud/deleteUser"; 
 
-const dummyData = [
-  // Original entries
-  {
-    id: "1",
-    email: "john.doe@example.com",
-    role: "admin",
-    no_hp: "08123456789",
-    full_name: "John Doe",
-    school: "High School A",
-    created_at: "2023-01-01T00:00:00Z",
-    updated_at: "2023-01-01T00:00:00Z",
-  },
-  {
-    id: "2",
-    email: "jane.smith@example.com",
-    role: "user",
-    no_hp: "08123456790",
-    full_name: "Jane Smith",
-    school: "High School B",
-    created_at: "2023-01-02T00:00:00Z",
-    updated_at: "2023-01-02T00:00:00Z",
-  },
-  {
-    id: "3",
-    email: "alice.jones@example.com",
-    role: "user",
-    no_hp: "08123456791",
-    full_name: "Alice Jones",
-    school: "High School C",
-    created_at: "2023-01-03T00:00:00Z",
-    updated_at: "2023-01-03T00:00:00Z",
-  },
-  {
-    id: "4",
-    email: "michael.brown@example.com",
-    role: "user",
-    no_hp: "08123456792",
-    full_name: "Michael Brown",
-    school: "High School D",
-    created_at: "2023-01-04T00:00:00Z",
-    updated_at: "2023-01-04T00:00:00Z",
-  },
-  {
-    id: "5",
-    email: "emily.davis@example.com",
-    role: "admin",
-    no_hp: "08123456793",
-    full_name: "Emily Davis",
-    school: "High School E",
-    created_at: "2023-01-05T00:00:00Z",
-    updated_at: "2023-01-05T00:00:00Z",
-  },
-  {
-    id: "6",
-    email: "robert.wilson@example.com",
-    role: "user",
-    no_hp: "08123456794",
-    full_name: "Robert Wilson",
-    school: "High School F",
-    created_at: "2023-01-06T00:00:00Z",
-    updated_at: "2023-01-06T00:00:00Z",
-  },
-  {
-    id: "7",
-    email: "sarah.johnson@example.com",
-    role: "user",
-    no_hp: "08123456795",
-    full_name: "Sarah Johnson",
-    school: "High School G",
-    created_at: "2023-01-07T00:00:00Z",
-    updated_at: "2023-01-07T00:00:00Z",
-  },
-  {
-    id: "8",
-    email: "david.miller@example.com",
-    role: "user",
-    no_hp: "08123456796",
-    full_name: "David Miller",
-    school: "High School H",
-    created_at: "2023-01-08T00:00:00Z",
-    updated_at: "2023-01-08T00:00:00Z",
-  },
-  {
-    id: "9",
-    email: "linda.garcia@example.com",
-    role: "user",
-    no_hp: "08123456797",
-    full_name: "Linda Garcia",
-    school: "High School I",
-    created_at: "2023-01-09T00:00:00Z",
-    updated_at: "2023-01-09T00:00:00Z",
-  },
-  {
-    id: "10",
-    email: "james.rodriguez@example.com",
-    role: "admin",
-    no_hp: "08123456798",
-    full_name: "James Rodriguez",
-    school: "High School J",
-    created_at: "2023-01-10T00:00:00Z",
-    updated_at: "2023-01-10T00:00:00Z",
-  },
-  {
-    id: "11",
-    email: "patricia.martinez@example.com",
-    role: "user",
-    no_hp: "08123456799",
-    full_name: "Patricia Martinez",
-    school: "High School K",
-    created_at: "2023-01-11T00:00:00Z",
-    updated_at: "2023-01-11T00:00:00Z",
-  },
-];
 
 export default function UserAdmin() {
-  const [users, setUsers] = useState(dummyData);
+  const { token } = useAuth();
+  const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
+  
 
   const handleAddUser = () => {
     setCurrentUser(null);
@@ -150,35 +45,159 @@ export default function UserAdmin() {
 
   const handleDeleteUser = (userId) => {
     const userToDelete = users.find(user => user.id === userId);
+    if (!userToDelete) return;
+    
     setUserToDelete(userToDelete);
     setIsDeleteDialogOpen(true);
   };
 
-  const confirmDeleteUser = () => {
-    if (userToDelete) {
+  const confirmDeleteUser = async () => {
+    if (!userToDelete || !token) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`http://localhost:3000/users/${userToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to Delete User: ${response.statusText}`);
+      }
+
       setUsers(users.filter(user => user.id !== userToDelete.id));
+      
+      toast({
+        title: "Success",
+        description: `User "${userToDelete.full_name}" deleted successfully`,
+      });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setError(error.message || "An error occurred while deleting user");
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while deleting user",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
       setIsDeleteDialogOpen(false);
       setUserToDelete(null);
     }
   };
 
-  const handleFormSubmit = (userData) => {
-    if (currentUser) {
-      // Editing existing user
-      setUsers(users.map(user => 
-        user.id === currentUser.id ? { ...userData, id: user.id, updated_at: new Date().toISOString() } : user
-      ));
-    } else {
-      // Adding new user
-      const newUser = {
-        ...userData,
-        id: (Math.max(...users.map(user => parseInt(user.id))) + 1).toString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setUsers([...users, newUser]);
+  const handleFormSubmit = async (userData) => {
+    if (!token) {
+      setError("No token found");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      let url = "http://localhost:3000/users";
+      let method = "POST";
+
+      // API request based on add or update
+      if (currentUser) {
+        url = `${url}/${currentUser.id}`;
+        method = "PUT";
+      }
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${method === "POST" ? "create" : "update"} user: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (currentUser) {
+        setUsers(users.map(user => 
+          user.id === currentUser.id ? result : user
+        ));
+        toast({
+          title: "Success!",
+          description: `User "${result.full_name}" has been updated`
+        });
+      } else {
+        setUsers([...users, result]);
+        toast({
+          title: "Success",
+          description: `User "${result.full_name}" has been created`
+        });
+      }
+      setIsFormOpen(false);
+    } catch (error) {
+      console.log(`Error ${currentUser ? 'updating' : 'creating'} user: `, error);
+      setError(error.message || `An error occurred while ${currentUser ? 'updating' : 'creating'} user`);
+      toast({
+        title: "Error",
+        description: error.message || `An error occurred while ${currentUser ? 'updating' : 'creating'} user`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+
+  const fetchUsers = async () => {
+    const token = localStorage.getItem("token")
+    if (!token) {
+      setError("No token found");
+      return;
+    }
+    try {
+      const response = await fetch("http://localhost:3000/users", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Unauthorized");
+        } else if (response.status === 403) {
+          throw new Error("Forbidden");
+        } else {
+          throw new Error("Failed to fetch users");
+        }
+      }
+
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setError(
+        error.message || "An error occurred while fetching users"
+      );
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while fetching users",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   return (
     <div className="flex mt-navbar flex-col">

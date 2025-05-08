@@ -5,65 +5,57 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton';
+
 import { Search, File, Building, Calendar } from "lucide-react";
+import axios from 'axios';
+import { useToast } from "@/hooks/use-toast";
 
-import thumbnailBlog from '../../assets/thumbnail.jpg' 
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  
+  return `${day}-${month}-${year}`;
+};
 
-const sampleResults = [
-  {
-    id: '1',
-    title: 'Lomba Kebersihan Antar Sekolah',
-    school: 'SMK Negeri 1 Cimahi',
-    event: 'Lomba WS Terbersih',
-    date: '16 Agustus 2024',
-    content: '<h2>Kegiatan Lomba Kebersihan</h2><p>Kegiatan lomba kebersihan ini bertujuan untuk meningkatkan kesadaran para siswa akan pentingnya kebersihan lingkungan sekolah.</p>',
-    thumbnail: thumbnailBlog,
-  },
-  {
-    id: '2',
-    title: 'Festival Seni Budaya Sekolah',
-    school: 'SMA Negeri 2 Bandung',
-    event: 'Festival Budaya',
-    date: '20 Agustus 2024',
-  },
-  {
-    id: '3',
-    title: 'Olimpiade Matematika Tingkat SMA',
-    school: 'SMA Negeri 3 Jakarta',
-    event: 'Olimpiade Matematika',
-    date: '25 Agustus 2024',
-  },
-  {
-    id: '4',
-    title: 'Kompetisi Robotik Nasional',
-    school: 'SMK Negeri 4 Surabaya',
-    event: 'Kompetisi Robotik',
-    date: '1 September 2024',
-  },
-  {
-    id: '5',
-    title: 'Turnamen Olahraga Antar SMA',
-    school: 'SMA Negeri 1 Yogyakarta',
-    event: 'Turnamen Olahraga',
-    date: '5 September 2024',
-  },
-  // {
-  //   id: '6',
-  //   title: 'Lomba Karya Tulis Ilmiah',
-  //   school: 'SMA Negeri 5 Malang',
-  //   event: 'LKTI Nasional',
-  //   date: '10 September 2024',
-  // }
-];
+// Dedicated skeleton component for consistency
+const SkeletonCard = () => {
+  return (
+    <Card className="overflow-hidden">
+      <div className="h-40 bg-gray-200">
+        <Skeleton className="w-full h-full" />
+      </div>
+      <CardHeader className="pb-2">
+        <Skeleton className="h-6 w-[200px]" />
+      </CardHeader>
+      <CardContent className="pb-2">
+        <div className="flex flex-col space-y-1 text-sm">
+          <div className="text-gray-700 flex items-center gap-2">
+            <Building size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </div>
+          <p className="text-gray-700 flex items-center gap-2">
+            <File size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </p>
+          <p className="text-gray-700 flex items-center gap-2">
+            <Calendar size={16} className="text-gray-500" />
+            <Skeleton className="h-4 w-[100px]" />
+          </p>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-8 w-full" />
+      </CardFooter>
+    </Card>
+  );
+};
 
 const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <Card className="overflow-hidden">
       <div className="h-40 bg-gray-200 overflow-hidden">
@@ -80,59 +72,30 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
         )}
       </div>
       <CardHeader className="pb-2">
-        {isLoading ? (
-          <Skeleton className="h-6 w-[200px]" />
-        ) : (
-          <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
-        )}
+        <CardTitle className="text-lg font-bold line-clamp-2">{title}</CardTitle>
       </CardHeader>
       <CardContent className="pb-2">
         <div className="flex flex-col space-y-1 text-sm">
           <div className="text-gray-700 flex items-center gap-2">
             <Building size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Sekolah:</span> {school}
-              </>
-            )}
+            <span className="font-medium">Sekolah:</span> {school}
           </div>
           <p className="text-gray-700 flex items-center gap-2">
             <File size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-                <span className="font-medium">Acara:</span> {event}
-              </>
-            )}
+            <span className="font-medium">Acara:</span> {event}
           </p>
           <p className="text-gray-700 flex items-center gap-2">
             <Calendar size={16} className="text-gray-500" />
-            { isLoading ? (
-              <Skeleton className="h-4 w-[100px]" />
-            ) : (
-              <>
-              <span className="font-medium">Tanggal:</span> {date}
-              </>
-            )}
-            
+            <span className="font-medium">Tanggal:</span> {formatDate(date)}
           </p>
         </div>
       </CardContent>
       <CardFooter>
-        {isLoading ? (
-          <Skeleton className="h-8 w-full" />
-          ) : (
-            <>
-              <Button variant="outline" className="w-full" asChild>
-                <Link to={`/blog/${id}`}>
-                  Lihat Detail
-                </Link>
-              </Button>
-            </>
-        )}
+        <Button variant="outline" className="w-full" asChild>
+          <Link to={`/blog/${id}`}>
+            Lihat Detail
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );
@@ -140,32 +103,110 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
 
 const SearchResults = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [eventType, setEventType] = useState('');
-  const [institution, setInstitution] = useState('');
-  const [dateFilter, setDateFilter] = useState('');
+  const [eventType, setEventType] = useState('all');
+  const [institution, setInstitution] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:3000/events');
+        setEvents(response.data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setError('Failed to fetch events. Please try again later.');
+        toast({
+          title: "Error",
+          description: "Failed to fetch events. Please try again later.",
+          variant: "destructive"
+        });
+      } finally {
+        // Add a small delay to ensure skeleton is shown properly
+        setTimeout(() => {
+          setLoading(false);
+        }, 200);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  // Filter events based on search query and filters
+  const filteredEvents = events.filter(event => {
+    // Only show published events to the public
+    if (event.status !== "published") {
+      return false;
+    }
+    
+    // Filter by search query
+    const matchesQuery = searchQuery === '' || 
+      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.school?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.event?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.content?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by event type
+    const matchesEventType = eventType === 'all' || 
+      (eventType && event.event?.toLowerCase().includes(eventType.toLowerCase()));
+    
+    // Filter by institution
+    const matchesInstitution = institution === 'all' || 
+      (institution && event.school?.toLowerCase().includes(institution.toLowerCase()));
+    
+    // Filter by date (improved with proper date comparison)
+    let matchesDate = true;
+    if (dateFilter !== 'all' && event.date) {
+      try {
+        const eventDate = new Date(event.date);
+        const today = new Date();
+        
+        // Reset time part for comparison
+        today.setHours(0, 0, 0, 0);
+        
+        if (dateFilter === 'upcoming' && eventDate < today) {
+          matchesDate = false;
+        } else if (dateFilter === 'past' && eventDate >= today) {
+          matchesDate = false;
+        }
+      } catch (err) {
+        console.error('Error comparing dates:', err);
+      }
+    }
+    
+    return matchesQuery && matchesEventType && matchesInstitution && matchesDate;
+  });
+  
 
   return (
     <div className="w-full min-w-fit py-6 px-20 mt-navbar">
       {/* Search Results Header */}
       <div className="flex flex-col justify-between mb-6">
         <h2 className="text-3xl font-bold mb-4 md:mb-0"> 
-          {sampleResults.length} Hasil Pencarian Ditemukan
+          {loading ? 'Mencari Event...' : `${filteredEvents.length} Hasil Pencarian Ditemukan`}
         </h2>
 
         <div className="flex flex-row mt-4 justify-between">
           <div className="relative flex-grow md:w-1/2 w-full pr-8">
             <Input
               type="text"
-              placeholder={searchQuery || "search"}
+              placeholder="Cari acara, sekolah, dll..."
+              value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-full"
+              disabled={loading}
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
           </div>
 
           {/* Filters using shadcn Select */}
           <div className="justify-between flex gap-2">
-            <Select value={eventType} onValueChange={setEventType}>
+            <Select value={eventType} onValueChange={setEventType} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <File size={16} className="text-gray-500" />
@@ -178,10 +219,11 @@ const SearchResults = () => {
                 <SelectItem value="festival">Festival</SelectItem>
                 <SelectItem value="olimpiade">Olimpiade</SelectItem>
                 <SelectItem value="kompetisi">Kompetisi</SelectItem>
+                <SelectItem value="pengumuman">Pengumuman</SelectItem>
               </SelectContent>
             </Select>
 
-            <Select value={institution} onValueChange={setInstitution}>
+            <Select value={institution} onValueChange={setInstitution} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <Building size={16} className="text-gray-500" />
@@ -195,7 +237,7 @@ const SearchResults = () => {
               </SelectContent>
             </Select>
 
-            <Select value={dateFilter} onValueChange={setDateFilter}>
+            <Select value={dateFilter} onValueChange={setDateFilter} disabled={loading}>
               <SelectTrigger className="w-full md:w-36">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} className="text-gray-500" />
@@ -212,19 +254,40 @@ const SearchResults = () => {
         </div>
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="text-red-500 mb-4 p-4 bg-red-50 rounded">
+          {error}
+        </div>
+      )}
+
       {/* Search Results Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sampleResults.map((result) => (
-          <ShadcnResultCard 
-            key={result.id}
-            id={result.id}
-            title={result.title}
-            school={result.school}
-            event={result.event}
-            date={result.date}
-            thumbnail={result.thumbnail}
-          />
-        ))}
+        {loading ? (
+          // Show skeleton loaders while loading
+          Array(6).fill().map((_, index) => (
+            <SkeletonCard key={`skeleton-${index}`} />
+          ))
+        ) : filteredEvents.length > 0 ? (
+          // Show filtered results
+          filteredEvents.map((event) => (
+            <ShadcnResultCard 
+              key={event.id}
+              id={event.id}
+              title={event.title}
+              school={event.school}
+              event={event.event}
+              date={event.date}
+              thumbnail={event.thumbnail}
+            />
+          ))
+        ) : (
+          // No results found
+          <div className="col-span-3 text-center py-8">
+            <p className="text-lg text-gray-500">Tidak ada hasil yang ditemukan.</p>
+            <p className="text-sm text-gray-400">Coba ubah kata kunci pencarian atau filter Anda.</p>
+          </div>
+        )}
       </div>
     </div>
   )

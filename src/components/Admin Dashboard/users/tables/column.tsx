@@ -123,22 +123,23 @@ export const columns = (
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                onEdit(user);
-              }}
-            >
-              View Details
-            </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={(e) => {
                 e.preventDefault();
@@ -149,8 +150,7 @@ export const columns = (
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-red-600"
-              onSelect={(e) => {
-                e.preventDefault();
+              onSelect={() => {
                 onDelete(user.id);
               }}
             >

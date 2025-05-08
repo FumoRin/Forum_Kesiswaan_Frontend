@@ -11,6 +11,25 @@ const BlogCard = ({ blog, onEdit, onDelete }) => {
     return doc.body.textContent || '';
   };
 
+  // Function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString; // Return original if invalid date
+      
+      const day = date.getDate();
+      const month = date.toLocaleString('id-ID', { month: 'long' });
+      const year = date.getFullYear();
+      
+      return `${day} ${month} ${year}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString;
+    }
+  };
+
   return (
     <Card className="overflow-hidden">
       <div className="h-40 bg-gray-200 overflow-hidden">
@@ -35,7 +54,7 @@ const BlogCard = ({ blog, onEdit, onDelete }) => {
         </div>
         <div className="text-sm text-gray-600 mb-2">
           <p>{blog.school}</p>
-          <p>{blog.event} • {blog.date}</p>
+          <p>{blog.event} • {formatDate(blog.date)}</p>
         </div>
         <p className="text-sm text-gray-700 line-clamp-3">
           {stripHtml(blog.content)}
