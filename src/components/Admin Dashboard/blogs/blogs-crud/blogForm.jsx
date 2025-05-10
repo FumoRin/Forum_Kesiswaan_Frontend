@@ -65,8 +65,10 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     
     toast({
       title: "Success",
-      description: isEditMode ? "Blog updated successfully" : "Blog created successfully",
-      variant: "success"
+      description: formData.status === 'published' 
+        ? "Blog published successfully." 
+        : "Blog saved as draft.",
+      variant: "success",
     });
   });
 

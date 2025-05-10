@@ -273,7 +273,7 @@ const Homepage = () => {
       </section>
 
       {/* Section 3 - Search Section */}
-      <section ref={section3Ref} className="min-h-[50vh] bg-white relative py-12">
+      <section ref={section3Ref} className="min-h-[50vh] bg-white relative py-16">
         {/* Background Box */}
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[80%] h-[80%] bg-gradient-to-r from-blue-800 to-indigo-900 rounded-xl -z-10 shadow-2xl">
           {/* Pattern Overlay */}
@@ -285,6 +285,8 @@ const Homepage = () => {
         
         <div className="container mx-auto flex items-center justify-center">
           <div className="w-full max-w-6xl mx-auto py-8 px-4 z-10">
+            <h2 className="text-3xl font-bold mb-6 text-center">Cari Acara Yang Kamu Cari</h2> 
+            
             <Card className="rounded-lg shadow-xl">
               <CardContent className="p-6">
                 <form onSubmit={handleSearch}>
