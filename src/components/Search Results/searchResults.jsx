@@ -1,5 +1,5 @@
 import react, { useState, useEffect} from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -38,14 +38,14 @@ const SkeletonCard = () => {
             <Building size={16} className="text-gray-500" />
             <Skeleton className="h-4 w-[100px]" />
           </div>
-          <p className="text-gray-700 flex items-center gap-2">
+          <div className="text-gray-700 flex items-center gap-2">
             <File size={16} className="text-gray-500" />
             <Skeleton className="h-4 w-[100px]" />
-          </p>
-          <p className="text-gray-700 flex items-center gap-2">
+          </div>
+          <div className="text-gray-700 flex items-center gap-2">
             <Calendar size={16} className="text-gray-500" />
             <Skeleton className="h-4 w-[100px]" />
-          </p>
+          </div>
         </div>
       </CardContent>
       <CardFooter>
@@ -102,6 +102,8 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
 };
 
 const SearchResults = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [eventType, setEventType] = useState('all');
   const [institution, setInstitution] = useState('all');
@@ -111,11 +113,27 @@ const SearchResults = () => {
   const [error, setError] = useState(null);
   const { toast } = useToast();
 
+  // Parse URL parameters on component mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    
+    // Set search form values from URL parameters
+    if (params.get('query')) setSearchQuery(params.get('query'));
+    if (params.get('eventType')) setEventType(params.get('eventType'));
+    if (params.get('institution')) setInstitution(params.get('institution'));
+    if (params.get('dateFilter')) setDateFilter(params.get('dateFilter'));
+  }, [location.search]);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/events');
+        
+        // Create query parameters
+        const params = new URLSearchParams(location.search);
+        
+        // Make API request with search parameters
+        const response = await axios.get('http://localhost:3000/search/events', { params });
         setEvents(response.data);
         setError(null);
       } catch (err) {
@@ -135,7 +153,23 @@ const SearchResults = () => {
     };
 
     fetchEvents();
-  }, []);
+  }, [location.search]); // Re-fetch when search params change
+
+  // Handle search form submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    // Create query params object
+    const params = new URLSearchParams();
+    
+    if (searchQuery) params.append("query", searchQuery);
+    if (eventType !== 'all') params.append("eventType", eventType);
+    if (institution !== 'all') params.append("institution", institution);
+    if (dateFilter !== 'all') params.append("dateFilter", dateFilter);
+    
+    // Update URL with new search parameters
+    navigate(`/search-results?${params.toString()}`, { replace: true });
+  };
 
   // Filter events based on search query and filters
   const filteredEvents = events.filter(event => {
@@ -192,65 +226,73 @@ const SearchResults = () => {
         </h2>
 
         <div className="flex flex-row mt-4 justify-between">
-          <div className="relative flex-grow md:w-1/2 w-full pr-8">
-            <Input
-              type="text"
-              placeholder="Cari acara, sekolah, dll..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 w-full"
-              disabled={loading}
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          </div>
+          <form onSubmit={handleSearch} className="flex flex-row gap-4 w-full justify-between">
+            <div className="relative flex-grow md:w-1/2 w-full pr-8">
+              <Input
+                type="text"
+                placeholder="Cari acara, sekolah, dll..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-full"
+                disabled={loading}
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            </div>
 
-          {/* Filters using shadcn Select */}
-          <div className="justify-between flex gap-2">
-            <Select value={eventType} onValueChange={setEventType} disabled={loading}>
-              <SelectTrigger className="w-full md:w-36">
-                <div className="flex items-center gap-2">
-                  <File size={16} className="text-gray-500" />
-                  <SelectValue placeholder="Tipe Acara" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="lomba">Lomba</SelectItem>
-                <SelectItem value="festival">Festival</SelectItem>
-                <SelectItem value="olimpiade">Olimpiade</SelectItem>
-                <SelectItem value="kompetisi">Kompetisi</SelectItem>
-                <SelectItem value="pengumuman">Pengumuman</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Filters using shadcn Select */}
+            <div className="justify-between flex gap-2">
+              <Select value={eventType} onValueChange={setEventType} disabled={loading}>
+                <SelectTrigger className="w-full md:w-36">
+                  <div className="flex items-center gap-2">
+                    <File size={16} className="text-gray-500" />
+                    <SelectValue placeholder="Tipe Acara" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  <SelectItem value="lomba">Lomba</SelectItem>
+                  <SelectItem value="festival">Festival</SelectItem>
+                  <SelectItem value="olimpiade">Olimpiade</SelectItem>
+                  <SelectItem value="seminar">Seminar</SelectItem>
+                  <SelectItem value="workshop">Workshop</SelectItem>
+                  <SelectItem value="pengumuman">Pengumuman</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={institution} onValueChange={setInstitution} disabled={loading}>
-              <SelectTrigger className="w-full md:w-36">
-                <div className="flex items-center gap-2">
-                  <Building size={16} className="text-gray-500" />
-                  <SelectValue placeholder="Instansi" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="sma">SMA</SelectItem>
-                <SelectItem value="smk">SMK</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select value={institution} onValueChange={setInstitution} disabled={loading}>
+                <SelectTrigger className="w-full md:w-36">
+                  <div className="flex items-center gap-2">
+                    <Building size={16} className="text-gray-500" />
+                    <SelectValue placeholder="Instansi" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  <SelectItem value="sma">SMA</SelectItem>
+                  <SelectItem value="smk">SMK</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={dateFilter} onValueChange={setDateFilter} disabled={loading}>
-              <SelectTrigger className="w-full md:w-36">
-                <div className="flex items-center gap-2">
-                  <Calendar size={16} className="text-gray-500" />
-                  <SelectValue placeholder="Tanggal" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="upcoming">Mendatang</SelectItem>
-                <SelectItem value="past">Selesai</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              <Select value={dateFilter} onValueChange={setDateFilter} disabled={loading}>
+                <SelectTrigger className="w-full md:w-36">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={16} className="text-gray-500" />
+                    <SelectValue placeholder="Tanggal" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua</SelectItem>
+                  <SelectItem value="upcoming">Mendatang</SelectItem>
+                  <SelectItem value="past">Selesai</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button type="submit" disabled={loading}>
+                <Search size={16} className="mr-2" />
+                Cari
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
 

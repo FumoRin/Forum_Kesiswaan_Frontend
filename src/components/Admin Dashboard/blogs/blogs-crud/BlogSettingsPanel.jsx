@@ -129,11 +129,12 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Semua">Semua</SelectItem>
-                  <SelectItem value="Pengumuman">Pengumuman</SelectItem>
-                  <SelectItem value="Lomba">Perlombaan</SelectItem>
+                  <SelectItem value="Lomba">Lomba</SelectItem>
                   <SelectItem value="Festival">Festival</SelectItem>
                   <SelectItem value="Olimpiade">Olimpiade</SelectItem>
-                  <SelectItem value="Kompetisi">Kompetisi</SelectItem>
+                  <SelectItem value="Seminar">Seminar</SelectItem>
+                  <SelectItem value="Workshop">Workshop</SelectItem>
+                  <SelectItem value="Pengumuman">Pengumuman</SelectItem>
                 </SelectContent>
               </Select>
             </div>

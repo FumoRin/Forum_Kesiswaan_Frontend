@@ -175,7 +175,7 @@ const AboutPage = () => {
               </div>
               <CardContent className="p-6 text-center">
                 <h3 className="font-bold text-xl mb-2">Achmad Fadil</h3>
-                <p className="text-gray-600">Frond End Developer</p>
+                <p className="text-gray-600">FrontEnd Developer</p>
               </CardContent>
             </Card>
             

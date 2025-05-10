@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Select,
   SelectContent,
@@ -19,6 +21,7 @@ import daun from "../../assets/Daun.png";
 gsap.registerPlugin(ScrollTrigger);
 
 const Homepage = () => {
+  const navigate = useNavigate();
   const containerRef = useRef(null);
   const section1Ref = useRef(null);
   const section2Ref = useRef(null);
@@ -26,65 +29,65 @@ const Homepage = () => {
   const section4Ref = useRef(null);
   const eventsContainerRef = useRef(null);
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Search form states
+  const [searchQuery, setSearchQuery] = useState("");
+  const [eventType, setEventType] = useState("");
+  const [institution, setInstitution] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
 
-  // Mock event data
+  // Fetch real event data from backend
   useEffect(() => {
-    // This would be replaced with an actual API call
-    const mockEvents = [
-      {
-        id: 19,
-        title: "Lomba Debat Bahasa Inggris",
-        school: "SMKN 1 CIMAHI",
-        event: "Lomba",
-        date: "2025-05-06T00:00:00.000Z",
-        content: "<p><strong><em><u>Lomba Debat Tingkat Kota</u></em></strong></p>",
-        thumbnail: "https://via.placeholder.com/300x200",
-        status: "published",
-      },
-      {
-        id: 20,
-        title: "Workshop Coding",
-        school: "SMA NEGERI 3 CIMAHI",
-        event: "Workshop",
-        date: "2025-05-10T00:00:00.000Z",
-        content: "<p>Workshop Programming untuk Pemula</p>",
-        thumbnail: "https://via.placeholder.com/300x200",
-        status: "published",
-      },
-      {
-        id: 21,
-        title: "Seminar Entrepreneurship",
-        school: "SMK PASUNDAN CIMAHI",
-        event: "Seminar",
-        date: "2025-05-15T00:00:00.000Z",
-        content: "<p>Seminar untuk membangun jiwa wirausaha</p>",
-        thumbnail: "https://via.placeholder.com/300x200",
-        status: "published",
-      },
-      {
-        id: 22,
-        title: "Festival Seni Budaya",
-        school: "SMAN 2 CIMAHI",
-        event: "Festival",
-        date: "2025-05-20T00:00:00.000Z",
-        content: "<p>Festival seni dan budaya tahunan</p>",
-        thumbnail: "https://via.placeholder.com/300x200",
-        status: "published",
-      },
-      {
-        id: 23,
-        title: "Kompetisi Robotik",
-        school: "SMK INFORMATIKA CIMAHI",
-        event: "Lomba",
-        date: "2025-05-25T00:00:00.000Z",
-        content: "<p>Kompetisi robotik tingkat SMA/SMK</p>",
-        thumbnail: "https://via.placeholder.com/300x200",
-        status: "published",
-      },
-    ];
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:3000/events');
+        // Filter published events only and limit to 5 recent events
+        const publishedEvents = response.data
+          .filter(event => event.status === "published")
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 5);
+        setEvents(publishedEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        // Fallback to mock data if API fails
+        setEvents([
+          {
+            id: 19,
+            title: "Lomba Debat Bahasa Inggris",
+            school: "SMKN 1 CIMAHI",
+            event: "Lomba",
+            date: "2025-05-06T00:00:00.000Z",
+            content: "<p><strong><em><u>Lomba Debat Tingkat Kota</u></em></strong></p>",
+            thumbnail: "https://via.placeholder.com/300x200",
+            status: "published",
+          },
+          // ... rest of mock data
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setEvents(mockEvents);
+    fetchEvents();
   }, []);
+
+  // Handle search form submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    
+    // Create query params object
+    const params = new URLSearchParams();
+    
+    if (searchQuery) params.append("query", searchQuery);
+    if (eventType) params.append("eventType", eventType);
+    if (institution) params.append("institution", institution);
+    if (dateFilter) params.append("dateFilter", dateFilter);
+    
+    // Navigate to search results page with query params
+    navigate(`/search-results?${params.toString()}`);
+  };
 
   // Parallax and animation effects
   useEffect(() => {
@@ -284,64 +287,69 @@ const Homepage = () => {
           <div className="w-full max-w-6xl mx-auto py-8 px-4 z-10">
             <Card className="rounded-lg shadow-xl">
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4 justify-center mb-4">
-                  <div className="relative w-full md:w-64">
-                    <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black-500 z-10" size={18} />
-                    <Select>
-                      <SelectTrigger className="w-full bg-gray-50 pl-10">
-                        <SelectValue placeholder="Tipe Acara" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="seminar">Seminar</SelectItem>
-                        <SelectItem value="workshop">Workshop</SelectItem>
-                        <SelectItem value="conference">Conference</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <form onSubmit={handleSearch}>
+                  <div className="flex flex-col md:flex-row gap-4 justify-center mb-4">
+                    <div className="relative w-full md:w-64">
+                      <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black-500 z-10" size={18} />
+                      <Select value={eventType} onValueChange={setEventType}>
+                        <SelectTrigger className="w-full bg-gray-50 pl-10">
+                          <SelectValue placeholder="Tipe Acara" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="lomba">Lomba</SelectItem>
+                          <SelectItem value="festival">Festival</SelectItem>
+                          <SelectItem value="olimpiade">Olimpiade</SelectItem>
+                          <SelectItem value="seminar">Seminar</SelectItem>
+                          <SelectItem value="workshop">Workshop</SelectItem>
+                          <SelectItem value="pengumuman">Pengumuman</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="relative w-full md:w-64">
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" size={18} />
+                      <Select value={institution} onValueChange={setInstitution}>
+                        <SelectTrigger className="w-full bg-gray-50 pl-10">
+                          <SelectValue placeholder="Sekolah" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sma">SMA</SelectItem>
+                          <SelectItem value="smk">SMK</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="relative w-full md:w-64">
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" size={18} />
+                      <Select value={dateFilter} onValueChange={setDateFilter}>
+                        <SelectTrigger className="w-full bg-gray-50 pl-10">
+                          <SelectValue placeholder="Pelaksanaan Acara" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="upcoming">Mendatang</SelectItem>
+                          <SelectItem value="past">Selesai</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div className="relative w-full md:w-64">
-                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" size={18} />
-                    <Select>
-                      <SelectTrigger className="w-full bg-gray-50 pl-10">
-                        <SelectValue placeholder="Instansi" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="gov">Government</SelectItem>
-                        <SelectItem value="edu">Education</SelectItem>
-                        <SelectItem value="corp">Corporate</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="relative w-full md:w-64">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" size={18} />
-                    <Select>
-                      <SelectTrigger className="w-full bg-gray-50 pl-10">
-                        <SelectValue placeholder="Tanggal" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="recent">Recent</SelectItem>
-                        <SelectItem value="lastMonth">Last Month</SelectItem>
-                        <SelectItem value="lastYear">Last Year</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="flex">
-                  <div className="relative flex-grow">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={24} />
-                    <Input
-                      type="text"
-                      placeholder="Search"
-                      className="w-full pl-12 bg-gray-50 h-12 rounded-r-none"
+                  <div className="flex">
+                    <div className="relative flex-grow">
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={24} />
+                      <Input
+                        type="text"
+                        placeholder="Search"
+                        className="w-full pl-12 bg-gray-50 h-12 rounded-r-none"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                       />
+                    </div>
+                    <Button type="submit" className="h-12 rounded-l-none px-6 bg-blue-600 hover:bg-blue-700">
+                      <Search className="mr-2" size={18} />
+                      Search
+                    </Button>
                   </div>
-                  <Button className="h-12 rounded-l-none px-6 bg-blue-600 hover:bg-blue-700">
-                    <Search className="mr-2" size={18} />
-                    Search
-                  </Button>
-                </div>
+                </form>
               </CardContent>
             </Card>
           </div>
@@ -385,9 +393,12 @@ const Homepage = () => {
               >
                 <div className="relative h-40 rounded-t-lg overflow-hidden">
                   <img 
-                    src={event.thumbnail} 
+                    src={event.thumbnail || "https://via.placeholder.com/300x200"} 
                     alt={event.title} 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = "https://via.placeholder.com/300x200";
+                    }}
                   />
                   <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 m-2 rounded">
                     {event.event}
@@ -404,6 +415,7 @@ const Homepage = () => {
                     variant="outline" 
                     size="sm" 
                     className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                    onClick={() => navigate(`/blog/${event.id}`)}
                   >
                     Lihat Detail
                   </Button>
