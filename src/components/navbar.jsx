@@ -123,118 +123,119 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Toggle Button */}
-<div className="md:hidden">
-  <button
-    onClick={toggleDropdown}
-    className="text-white focus:outline-none"
-    aria-label="Toggle Sidebar"
-  >
-    <svg
-      className="w-6 h-6"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M4 6h16M4 12h16M4 18h16"
-      />
-    </svg>
-  </button>
-</div>
+      <div className="md:hidden">
+        <button
+          onClick={toggleDropdown}
+          className="text-white focus:outline-none"
+          aria-label="Toggle Sidebar"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+      </div>
 
-{/* Sidebar Overlay */}
-{showSidebar && (
-  <div className="fixed inset-0 z-40 bg-black bg-opacity-0" onClick={toggleDropdown} />
-)}
-
-{/* Sidebar */}
-<div
-  className={`fixed top-0 right-0 z-50 h-full w-64 bg-[#2A2828] text-white transform ${
-    showSidebar ? "translate-x-0" : "translate-x-full"
-  } transition-transform duration-300 ease-in-out md:hidden`}
->
-  <div className="p-4 py-6 flex justify-end items-center">
-    <button onClick={toggleDropdown} aria-label="Close Sidebar">
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M6 18L18 6M6 6l12 12"
+      {/* Sidebar Overlay */}
+      {showSidebar && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-0"
+          onClick={toggleDropdown}
         />
-      </svg>
-    </button>
-  </div>
+      )}
 
-  <div className="flex flex-col space-y-4 p-4 bg-[#2A2828] h-screen items-center gap-6 text-xl">
-    {!isAdminRoute ? (
-      <>
-        <Link to="/" onClick={toggleDropdown}>
-          Home
-        </Link>
-        <Link to="/search-results" onClick={toggleDropdown}>
-          Pencarian
-        </Link>
-        <Link to="/about" onClick={toggleDropdown}>
-          Tentang Kami
-        </Link>
-        {userRole === "admin" && (
-          <Link to="/admin" onClick={toggleDropdown}>
-            Dashboard
-          </Link>
-        )}
-      </>
-    ) : (
-      <>
-        <Link to="/admin" onClick={toggleDropdown}>
-          Dashboard
-        </Link>
-        <Link to="/admin/users" onClick={toggleDropdown}>
-          Users
-        </Link>
-        <Link to="/admin/blogs" onClick={toggleDropdown}>
-          Blogs
-        </Link>
-        <Link to="/" onClick={toggleDropdown}>
-          Homepage
-        </Link>
-      </>
-    )}
-
-    {isAuthenticated ? (
-      <button
-        onClick={() => {
-          handleLogout();
-          toggleDropdown();
-        }}
-        className="text-left hover:text-[#DF2E38]"
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 z-50 h-full w-64 bg-[#2A2828] text-white transform ${
+          showSidebar ? "translate-x-0" : "translate-x-full"
+        } transition-transform duration-300 ease-in-out md:hidden`}
       >
-        Logout
-      </button>
-    ) : (
-      <Link
-        to="/auth"
-        state={{ tab: "login" }}
-        className="hover:text-[#DF2E38]"
-        onClick={toggleDropdown}
-      >
-        Login
-      </Link>
-    )}
-  </div>
-</div>
+        <div className="p-4 py-6 flex justify-end items-center">
+          <button onClick={toggleDropdown} aria-label="Close Sidebar">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
-      
+        <div className="flex flex-col space-y-4 p-4 bg-[#2A2828] h-screen items-center gap-6 text-xl font-semibold">
+          {!isAdminRoute ? (
+            <>
+              <Link to="/" onClick={toggleDropdown}>
+                Home
+              </Link>
+              <Link to="/search-results" onClick={toggleDropdown}>
+                Pencarian
+              </Link>
+              <Link to="/about" onClick={toggleDropdown}>
+                Tentang Kami
+              </Link>
+              {userRole === "admin" && (
+                <Link to="/admin" onClick={toggleDropdown}>
+                  Dashboard
+                </Link>
+              )}
+            </>
+          ) : (
+            <>
+              <Link to="/admin" onClick={toggleDropdown}>
+                Dashboard
+              </Link>
+              <Link to="/admin/users" onClick={toggleDropdown}>
+                Users
+              </Link>
+              <Link to="/admin/blogs" onClick={toggleDropdown}>
+                Blogs
+              </Link>
+              <Link to="/" onClick={toggleDropdown}>
+                Homepage
+              </Link>
+            </>
+          )}
+
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                handleLogout();
+                toggleDropdown();
+              }}
+              className="bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              state={{ tab: "login" }}
+             className="bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
+              onClick={toggleDropdown}
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      </div>
     </nav>
   );
 };
