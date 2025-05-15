@@ -218,16 +218,16 @@ const SearchResults = () => {
   
 
   return (
-    <div className="w-full min-w-fit py-6 px-20 mt-navbar">
+    <div className="w-full min-w-fit py-4 px-4 md:py-6 md:px-20 mt-navbar">
       {/* Search Results Header */}
       <div className="flex flex-col justify-between mb-6">
-        <h2 className="text-3xl font-bold mb-4 md:mb-0"> 
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-0"> 
           {loading ? 'Mencari Event...' : `${filteredEvents.length} Hasil Pencarian Ditemukan`}
         </h2>
 
-        <div className="flex flex-row mt-4 justify-between">
-          <form onSubmit={handleSearch} className="flex flex-row gap-4 w-full justify-between">
-            <div className="relative flex-grow md:w-1/2 w-full pr-8">
+        <div className="flex flex-col md:flex-row mt-4 gap-4">
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 w-full">
+            <div className="relative flex-grow w-full">
               <Input
                 type="text"
                 placeholder="Cari acara, sekolah, dll..."
@@ -240,7 +240,7 @@ const SearchResults = () => {
             </div>
 
             {/* Filters using shadcn Select */}
-            <div className="justify-between flex gap-2">
+            <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
               <Select value={eventType} onValueChange={setEventType} disabled={loading}>
                 <SelectTrigger className="w-full md:w-36">
                   <div className="flex items-center gap-2">
@@ -287,7 +287,7 @@ const SearchResults = () => {
                 </SelectContent>
               </Select>
               
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} className="w-full md:w-auto">
                 <Search size={16} className="mr-2" />
                 Cari
               </Button>
@@ -304,7 +304,7 @@ const SearchResults = () => {
       )}
 
       {/* Search Results Card */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
           // Show skeleton loaders while loading
           Array(6).fill().map((_, index) => (
