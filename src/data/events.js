@@ -24,50 +24,6 @@ const events = [
     updated_at: "2025-05-10T01:43:04.000Z",
   },
   {
-    id: 3,
-    title: "Pengumuman",
-    school: "SMKN 1 CIMAHI",
-    event: "Pengumuman",
-    date: "2025-04-17T00:00:00.000Z",
-    content:
-      '<p><strong>INI ADALAH PENGUMUMAN</strong></p><img src="https://picsum.photos/id/1019/800/600">',
-    thumbnail: "https://picsum.photos/id/1019/800/600",
-    gallery: [
-      "https://picsum.photos/id/1019/800/600",
-      "https://picsum.photos/id/1020/800/600",
-    ],
-    status: "published",
-    created_at: "2025-05-02T08:15:09.000Z",
-    updated_at: "2025-05-10T01:42:25.000Z",
-  },
-  {
-    id: 13,
-    title: "ANOTHER TESTING",
-    school: "SMKN 1 Cimahi",
-    event: "Pengumuman",
-    date: "2025-05-05T00:00:00.000Z",
-    content:
-      "<p>Hopefully the date handling and blog submission is <strong>FIXED</strong> after or else I'm losing my mind</p>",
-    thumbnail: "https://picsum.photos/id/1021/800/600",
-    gallery: ["https://picsum.photos/id/1021/800/600"],
-    status: "published",
-    created_at: "2025-05-05T10:06:49.000Z",
-    updated_at: "2025-05-05T10:27:23.000Z",
-  },
-  {
-    id: 20,
-    title: "Yes",
-    school: "SMAN 1 Cimahi",
-    event: "Festival",
-    date: "2025-05-26T00:00:00.000Z",
-    content: "<p>nothing is here</p>",
-    thumbnail: "https://picsum.photos/id/1022/800/600",
-    gallery: [],
-    status: "published",
-    created_at: "2025-05-07T01:33:15.000Z",
-    updated_at: "2025-05-07T01:37:57.000Z",
-  },
-  {
     id: 21,
     title: "Lomba Debat Bahasa Inggris",
     school: "SMKN 1 CIMAHI",
@@ -112,6 +68,156 @@ const events = [
     status: "published",
     created_at: "2025-05-02T14:30:00.000Z",
     updated_at: "2025-05-02T14:30:00.000Z",
+  },
+  {
+    id: 23,
+    title: "Festival Seni dan Budaya",
+    school: "SMA Negeri 3 Cimahi",
+    event: "Festival",
+    date: "2025-07-20T00:00:00.000Z",
+    content:
+      '<h2>Festival Seni dan Budaya Tradisional</h2><p>SMA Negeri 3 Cimahi menyelenggarakan Festival Seni dan Budaya Tradisional yang akan menampilkan berbagai bentuk kesenian daerah dari seluruh Indonesia. Acara ini bertujuan untuk melestarikan dan mengenalkan kembali nilai-nilai budaya tradisional kepada generasi muda.</p><h3>Rangkaian Acara:</h3><ul><li>Pameran kerajinan tangan tradisional</li><li>Pertunjukan tari daerah</li><li>Workshop pembuatan batik</li><li>Lomba kuliner tradisional</li><li>Penampilan musik etnik</li></ul><p>Festival ini terbuka untuk umum dan akan berlangsung selama tiga hari di lingkungan SMA Negeri 3 Cimahi. Pengunjung diharapkan dapat merasakan pengalaman budaya yang autentik dan mendapatkan wawasan baru tentang kekayaan budaya Indonesia.</p><p>Untuk informasi lebih lanjut, silakan hubungi panitia pelaksana melalui email: festival@sman3cimahi.sch.id</p><img src="https://picsum.photos/id/1036/800/600" alt="Dokumentasi Festival">',
+    thumbnail: "https://picsum.photos/id/1036/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1036/800/600",
+        thumbnail: "https://picsum.photos/id/1036/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1037/800/600",
+        thumbnail: "https://picsum.photos/id/1037/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1040/800/600",
+        thumbnail: "https://picsum.photos/id/1040/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-06-01T08:15:00.000Z",
+    updated_at: "2025-06-05T11:20:00.000Z",
+  },
+  {
+    id: 24,
+    title: "Kompetisi Robotika Nasional",
+    school: "SMK Negeri 2 Cimahi",
+    event: "Kompetisi",
+    date: "2025-08-05T00:00:00.000Z",
+    content:
+      "<h2>Kompetisi Robotika Tingkat Nasional</h2><p>SMK Negeri 2 Cimahi akan menjadi tuan rumah Kompetisi Robotika Nasional yang akan diikuti oleh ratusan tim dari seluruh Indonesia. Acara ini merupakan ajang bergengsi bagi para pelajar untuk menunjukkan kemampuan mereka dalam bidang teknologi dan robotika.</p><h3>Kategori Lomba:</h3><ul><li>Robot Line Follower</li><li>Robot Soccer</li><li>Drone Racing</li><li>Autonomous Robot Challenge</li></ul><p>Pendaftaran dibuka untuk siswa SMA/SMK di seluruh Indonesia dengan batas maksimal 3 tim per sekolah. Tim pemenang akan mewakili Indonesia pada kompetisi robotika internasional di Singapura.</p>",
+    thumbnail: "https://picsum.photos/id/1033/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1033/800/600",
+        thumbnail: "https://picsum.photos/id/1033/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1035/800/600",
+        thumbnail: "https://picsum.photos/id/1035/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-06-10T09:45:00.000Z",
+    updated_at: "2025-06-12T14:30:00.000Z",
+  },
+  {
+    id: 25,
+    title: "Seminar Kesehatan Mental Remaja",
+    school: "SMA Negeri 4 Cimahi",
+    event: "Seminar",
+    date: "2025-09-22T00:00:00.000Z",
+    content:
+      '<h2>Seminar Kesehatan Mental Remaja di Era Digital</h2><p>SMA Negeri 4 Cimahi mengadakan seminar tentang kesehatan mental remaja dengan tema "Menjaga Keseimbangan Mental di Era Digital". Seminar ini menghadirkan psikolog anak dan remaja serta pakar media sosial untuk membahas dampak teknologi terhadap kesehatan mental pelajar.</p><h3>Topik Pembahasan:</h3><ol><li>Pengaruh media sosial terhadap self-esteem remaja</li><li>Strategi mengatasi cyberbullying</li><li>Manajemen stres akademik</li><li>Digital wellbeing dan screen time management</li></ol><p>Seminar akan dilaksanakan secara hybrid (offline dan online) dan terbuka untuk umum. Peserta offline akan mendapatkan sertifikat dan merchandise eksklusif.</p>',
+    thumbnail: "https://picsum.photos/id/1042/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1042/800/600",
+        thumbnail: "https://picsum.photos/id/1042/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1045/800/600",
+        thumbnail: "https://picsum.photos/id/1045/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-08-15T11:20:00.000Z",
+    updated_at: "2025-08-20T13:45:00.000Z",
+  },
+  {
+    id: 26,
+    title: "Pelatihan Leadership dan Organisasi",
+    school: "SMA Negeri 1 Cimahi",
+    event: "Pelatihan",
+    date: "2025-10-18T00:00:00.000Z",
+    content:
+      "<h2>Pelatihan Kepemimpinan dan Manajemen Organisasi</h2><p>OSIS SMA Negeri 1 Cimahi menyelenggarakan pelatihan kepemimpinan dan manajemen organisasi untuk pengurus OSIS, MPK, dan organisasi siswa lainnya se-Kota Cimahi. Pelatihan ini bertujuan untuk meningkatkan soft skill dan kapasitas kepemimpinan para siswa.</p><h3>Materi Pelatihan:</h3><ul><li>Dasar-dasar kepemimpinan efektif</li><li>Manajemen konflik dalam organisasi</li><li>Public speaking dan komunikasi</li><li>Perencanaan program kerja dan evaluasi</li><li>Team building dan kolaborasi</li></ul><p>Fasilitator pelatihan adalah alumni SMA Negeri 1 Cimahi yang kini menjadi professional trainer dan motivator nasional. Peserta akan mendapat modul pelatihan dan sertifikat resmi.</p>",
+    thumbnail: "https://picsum.photos/id/1048/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1048/800/600",
+        thumbnail: "https://picsum.photos/id/1048/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1049/800/600",
+        thumbnail: "https://picsum.photos/id/1049/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1050/800/600",
+        thumbnail: "https://picsum.photos/id/1050/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-09-05T08:30:00.000Z",
+    updated_at: "2025-09-10T16:15:00.000Z",
+  },
+  {
+    id: 27,
+    title: "Olimpiade Sains dan Matematika",
+    school: "SMP Negeri 3 Cimahi",
+    event: "Olimpiade",
+    date: "2025-11-08T00:00:00.000Z",
+    content:
+      "<h2>Olimpiade Sains dan Matematika Tingkat SMP</h2><p>SMP Negeri 3 Cimahi akan mengadakan Olimpiade Sains dan Matematika untuk siswa SMP se-Kota Cimahi. Olimpiade ini bertujuan untuk meningkatkan minat dan prestasi siswa dalam bidang sains dan matematika.</p><h3>Kategori Olimpiade:</h3><ol><li>Matematika</li><li>Fisika</li><li>Biologi</li><li>IPA Terpadu</li></ol><p>Olimpiade akan dilaksanakan dalam dua tahap: babak penyisihan (tertulis) dan babak final (praktikum dan presentasi). Pemenang akan menerima trofi, medali, sertifikat, dan hadiah menarik lainnya.</p><p>Pendaftaran dibuka mulai 1 Oktober 2025 dan ditutup pada 31 Oktober 2025.</p>",
+    thumbnail: "https://picsum.photos/id/1051/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1051/800/600",
+        thumbnail: "https://picsum.photos/id/1051/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1052/800/600",
+        thumbnail: "https://picsum.photos/id/1052/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-10-01T10:00:00.000Z",
+    updated_at: "2025-10-05T15:30:00.000Z",
+  },
+  {
+    id: 28,
+    title: "Pameran Karya Siswa Jurusan Seni",
+    school: "SMKN 3 Cimahi",
+    event: "Pameran",
+    date: "2025-12-15T00:00:00.000Z",
+    content:
+      '<h2>Pameran Seni Akhir Semester</h2><p>Jurusan Seni Rupa dan Desain SMKN 3 Cimahi dengan bangga mempersembahkan pameran karya siswa akhir semester dengan tema "Identitas Lokal dalam Perspektif Global". Pameran ini menampilkan karya lukis, patung, grafis, fotografi, dan seni instalasi dari siswa kelas X hingga XII.</p><h3>Jadwal Pameran:</h3><ul><li>Pembukaan: 15 Desember 2025, pukul 09.00 WIB</li><li>Durasi: 15-20 Desember 2025</li><li>Lokasi: Aula SMKN 3 Cimahi</li></ul><p>Selain pameran, akan diadakan juga workshop seni untuk pengunjung dan talkshow dengan seniman profesional. Pameran terbuka untuk umum dan tidak dipungut biaya masuk.</p><p>Untuk informasi lebih lanjut, hubungi panitia pameran di email: pameran@smkn3cimahi.sch.id</p>',
+    thumbnail: "https://picsum.photos/id/1055/800/600",
+    gallery: [
+      {
+        original: "https://picsum.photos/id/1055/800/600",
+        thumbnail: "https://picsum.photos/id/1055/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1057/800/600",
+        thumbnail: "https://picsum.photos/id/1057/200/150",
+      },
+      {
+        original: "https://picsum.photos/id/1059/800/600",
+        thumbnail: "https://picsum.photos/id/1059/200/150",
+      },
+    ],
+    status: "published",
+    created_at: "2025-11-20T13:45:00.000Z",
+    updated_at: "2025-11-25T09:20:00.000Z",
   },
 ];
 
