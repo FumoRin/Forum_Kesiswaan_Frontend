@@ -3,7 +3,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
   Select,
   SelectContent,
@@ -17,6 +16,8 @@ import { Search, Calendar, Building, Tag, ChevronRight, ChevronLeft } from "luci
 import langit from "../../assets/Langit.png";
 import aula from "../../assets/Aula.png";
 import daun from "../../assets/Daun.png";
+import api from "../../data/api";
+import { getImageUrl } from "../../utils/imageUtils";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,34 +38,21 @@ const Homepage = () => {
   const [institution, setInstitution] = useState("");
   const [dateFilter, setDateFilter] = useState("");
 
-  // Fetch real event data from backend
+  // Fetch events from static data
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/events');
+        // Get events from our static API service
+        const response = await api.getAllEvents();
         // Filter published events only and limit to 5 recent events
-        const publishedEvents = response.data
+        const publishedEvents = response
           .filter(event => event.status === "published")
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 5);
         setEvents(publishedEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
-        // Fallback to mock data if API fails
-        setEvents([
-          {
-            id: 19,
-            title: "Lomba Debat Bahasa Inggris",
-            school: "SMKN 1 CIMAHI",
-            event: "Lomba",
-            date: "2025-05-06T00:00:00.000Z",
-            content: "<p><strong><em><u>Lomba Debat Tingkat Kota</u></em></strong></p>",
-            thumbnail: "https://via.placeholder.com/300x200",
-            status: "published",
-          },
-          // ... rest of mock data
-        ]);
       } finally {
         setLoading(false);
       }
@@ -262,7 +250,7 @@ const Homepage = () => {
             <div className="card p-6 rounded-lg shadow-lg bg-gray-100 opacity-0 translate-y-10 hover:border-2 hover:border-[#DF2E38] transition-all duration-300" id="card1">
               <h3 className="text-xl font-semibold mb-2">Event Siswa</h3>
               <p>Ikuti berbagai event menarik seperti seminar, workshop, dan lomba antar sekolah.</p>
-              <img src="/images/event.jpg" alt="Event Siswa" className="w-full h-48 object-cover rounded-md mb-4" />
+              {/* <img src="/images/event.jpg" alt="Event Siswa" className="w-full h-48 object-cover rounded-md mb-4" /> */}
             </div>
             <div className="card p-6 rounded-lg shadow-lg bg-gray-100 opacity-0 translate-y-10 hover:border-2 hover:border-[#DF2E38] transition-all duration-300" id="card2">
               <h3 className="text-xl font-semibold mb-2">Program Pendidikan</h3>
@@ -395,12 +383,9 @@ const Homepage = () => {
               >
                 <div className="relative h-40 rounded-t-lg overflow-hidden">
                   <img 
-                    src={event.thumbnail || "https://via.placeholder.com/300x200"} 
+                    src={getImageUrl(event.thumbnail) || "https://picsum.photos/id/1015/800/600"} 
                     alt={event.title} 
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = "https://via.placeholder.com/300x200";
-                    }}
                   />
                   <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-2 py-1 m-2 rounded">
                     {event.event}
