@@ -2,6 +2,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import logo from "../assets/logo.svg";
 import { Button } from "@/components/ui/button";
+import { Home, Search, Users } from "lucide-react";
+
 
 import { useAuth } from "./utils/authProvider";
 

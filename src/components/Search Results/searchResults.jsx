@@ -7,8 +7,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { Search, File, Building, Calendar } from "lucide-react";
-import axios from 'axios';
 import { useToast } from "@/hooks/use-toast";
+import api from "../../data/api";
+import { getImageUrl } from "../../utils/imageUtils";
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -61,7 +62,7 @@ const ShadcnResultCard = ({ title, id, school, event, date, thumbnail }) => {
       <div className="h-40 bg-gray-200 overflow-hidden">
         {thumbnail ? (
           <img 
-            src={thumbnail} 
+            src={getImageUrl(thumbnail)} 
             alt={title} 
             className="w-full h-full object-cover" 
           />
@@ -132,9 +133,17 @@ const SearchResults = () => {
         // Create query parameters
         const params = new URLSearchParams(location.search);
         
-        // Make API request with search parameters
-        const response = await axios.get('http://localhost:3000/search/events', { params });
-        setEvents(response.data);
+        // Get search parameters
+        const searchParams = {
+          query: params.get('query') || '',
+          eventType: params.get('eventType') || 'all',
+          institution: params.get('institution') || 'all',
+          dateFilter: params.get('dateFilter') || 'all'
+        };
+        
+        // Use our static API service
+        const response = await api.searchEvents(searchParams);
+        setEvents(response);
         setError(null);
       } catch (err) {
         console.error('Error fetching events:', err);
@@ -171,58 +180,12 @@ const SearchResults = () => {
     navigate(`/search-results?${params.toString()}`, { replace: true });
   };
 
-  // Filter events based on search query and filters
-  const filteredEvents = events.filter(event => {
-    // Only show published events to the public
-    if (event.status !== "published") {
-      return false;
-    }
-    
-    // Filter by search query
-    const matchesQuery = searchQuery === '' || 
-      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.school?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.event?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.content?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Filter by event type
-    const matchesEventType = eventType === 'all' || 
-      (eventType && event.event?.toLowerCase().includes(eventType.toLowerCase()));
-    
-    // Filter by institution
-    const matchesInstitution = institution === 'all' || 
-      (institution && event.school?.toLowerCase().includes(institution.toLowerCase()));
-    
-    // Filter by date (improved with proper date comparison)
-    let matchesDate = true;
-    if (dateFilter !== 'all' && event.date) {
-      try {
-        const eventDate = new Date(event.date);
-        const today = new Date();
-        
-        // Reset time part for comparison
-        today.setHours(0, 0, 0, 0);
-        
-        if (dateFilter === 'upcoming' && eventDate < today) {
-          matchesDate = false;
-        } else if (dateFilter === 'past' && eventDate >= today) {
-          matchesDate = false;
-        }
-      } catch (err) {
-        console.error('Error comparing dates:', err);
-      }
-    }
-    
-    return matchesQuery && matchesEventType && matchesInstitution && matchesDate;
-  });
-  
-
   return (
     <div className="w-full min-w-fit py-4 px-4 md:py-6 md:px-20 mt-navbar">
       {/* Search Results Header */}
       <div className="flex flex-col justify-between mb-6">
         <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-0"> 
-          {loading ? 'Mencari Event...' : `${filteredEvents.length} Hasil Pencarian Ditemukan`}
+          {loading ? 'Mencari Event...' : `${events.length} Hasil Pencarian Ditemukan`}
         </h2>
 
         <div className="flex flex-col md:flex-row mt-4 gap-4">
@@ -310,9 +273,9 @@ const SearchResults = () => {
           Array(6).fill().map((_, index) => (
             <SkeletonCard key={`skeleton-${index}`} />
           ))
-        ) : filteredEvents.length > 0 ? (
+        ) : events.length > 0 ? (
           // Show filtered results
-          filteredEvents.map((event) => (
+          events.map((event) => (
             <ShadcnResultCard 
               key={event.id}
               id={event.id}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { File, Building, Calendar, ChevronLeft } from 'lucide-react';
-import axios from 'axios';
 import thumbnail from '../../assets/thumbnail.jpg';
+import api from "../../data/api";
+import { getImageUrl, processContentImages } from "../../utils/imageUtils";
 
 import { 
   Card, 
@@ -50,8 +51,8 @@ const BlogPage = () => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3000/events/${id}`);
-        setBlog(response.data);
+        const response = await api.getEvent(id);
+        setBlog(response);
         setError(null);
       } catch (err) {
         console.error('Error fetching blog:', err);
@@ -148,6 +149,9 @@ const BlogPage = () => {
     );
   }
 
+  // Process content to handle image URLs
+  const processedContent = processContentImages(blog.content);
+
   // Parse gallery JSON if it's a string
   let galleryItems = [];
   if (blog.gallery) {
@@ -159,14 +163,19 @@ const BlogPage = () => {
       }
       
       // Transform gallery items to the format expected by the carousel
+      // and handle image URLs
       galleryItems = galleryItems.map(item => {
         if (typeof item === 'string') {
+          const url = getImageUrl(item);
           return {
-            original: item,
-            thumbnail: item
+            original: url,
+            thumbnail: url
           };
         }
-        return item;
+        return {
+          original: getImageUrl(item.original),
+          thumbnail: getImageUrl(item.thumbnail || item.original)
+        };
       });
     } catch (e) {
       console.error('Error parsing gallery data:', e);
@@ -225,7 +234,7 @@ const BlogPage = () => {
               <div className="w-full md:w-96 flex-shrink-0">
                 <div className="rounded-lg overflow-hidden bg-gray-100">
                   <img
-                    src={blog.thumbnail || thumbnail}
+                    src={getImageUrl(blog.thumbnail) || thumbnail}
                     alt={blog.title}
                     className="w-full h-full object-cover aspect-video"
                   />
@@ -240,7 +249,7 @@ const BlogPage = () => {
             {/* Blog Content - Render HTML content */}
             <div 
               className="prose prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-ul:list-disc prose-ul:pl-5 prose-ol:list-decimal prose-ol:pl-5 max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: blog.content }}
+              dangerouslySetInnerHTML={{ __html: processedContent }}
             />
 
             {/* Gallery Section */}
