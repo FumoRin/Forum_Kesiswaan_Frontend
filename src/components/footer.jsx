@@ -12,7 +12,6 @@ const Footer = () => {
           <nav className="flex flex-wrap justify-center gap-4 md:gap-6">
             <Link to="/" className="text-sm md:text-base text-gray-600 hover:text-gray-900">Home</Link>
             <Link to="/search-results" className="text-sm md:text-base text-gray-600 hover:text-gray-900">Pencarian</Link>
-            <Link to="/blog" className="text-sm md:text-base text-gray-600 hover:text-gray-900">Blog</Link>
             <Link to="/about" className="text-sm md:text-base text-gray-600 hover:text-gray-900">Tentang Kami</Link>
           </nav>
           <div className="text-xs md:text-sm text-gray-500 text-center">
