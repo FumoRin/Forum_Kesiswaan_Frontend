@@ -15,16 +15,17 @@ const AddUserForm = ({
   className = "",
   isPassword = false,
   showPassword,
-  toggleShowPassword
+  toggleShowPassword,
+  disabled
 }) => {
   return (
     <div className={`space-y-2 ${className}`}>
       <Label htmlFor={id} className="text-sm font-medium">
         {label} {required && <span className="text-red-500">*</span>}
       </Label>
-      
+
       <div className="relative">
-        <Input 
+        <Input
           id={id}
           type={isPassword ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
@@ -32,6 +33,7 @@ const AddUserForm = ({
           onChange={onChange}
           required={required}
           className={`w-full ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+          disabled={disabled}
         />
 
         {isPassword && (
@@ -48,7 +50,7 @@ const AddUserForm = ({
           </button>
         )}
       </div>
-      
+
       {error && (
         <p className="text-sm text-red-500">{error}</p>
       )}

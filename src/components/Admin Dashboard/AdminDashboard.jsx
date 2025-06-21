@@ -1,43 +1,45 @@
 import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
+import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,  
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, ArrowUp, Eye, ExternalLink, ArrowDown } from "lucide-react";
+import { Users, FileText, ArrowUp, Eye, ExternalLink, ArrowDown, School } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '@/components/utils/authProvider';
 
 export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  
+  const { userRole, userSchool } = useAuth();
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         // Get token from localStorage
         const token = localStorage.getItem('token');
-        
+
         if (!token) {
           throw new Error('Authentication required');
         }
-        
+
         const response = await axios.get(`http://localhost:3000/stats/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
-        
+
         setDashboardData(response.data);
         setError(null);
       } catch (err) {
@@ -47,15 +49,15 @@ export default function AdminDashboard() {
         setIsLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, []);
-  
+
   // Function to handle navigation
   const handleNavigation = (path) => {
     navigate(path);
   };
-  
+
   // Process stats data for display
   const getStatsData = () => {
     if (!dashboardData || !dashboardData.stats) {
@@ -64,26 +66,26 @@ export default function AdminDashboard() {
         { title: "Total Blog Posts", value: "0", total_Change: "0", icon: <FileText className="h-4 w-4" />, change: "0%", path: "/admin/blogs", isPositive: true }
       ];
     }
-    
+
     // Extract stats safely
     const usersStats = dashboardData.stats.users || { total: 0, change: 0, percentChange: 0, isPositive: true };
     const postsStats = dashboardData.stats.posts || { total: 0, change: 0, percentChange: 0, isPositive: true };
-    
+
     return [
-      { 
-        title: "Total Users", 
-        value: String(usersStats.total || 0), 
-        total_Change: String(Math.abs(usersStats.change || 0)), 
-        icon: <Users className="h-4 w-4" />, 
+      {
+        title: "Total Users",
+        value: String(usersStats.total || 0),
+        total_Change: String(Math.abs(usersStats.change || 0)),
+        icon: <Users className="h-4 w-4" />,
         change: `${usersStats.isPositive ? '+' : '-'}${Math.abs(usersStats.percentChange || 0)}%`,
         path: "/admin/users",
         isPositive: usersStats.isPositive
       },
-      { 
-        title: "Total Blog Posts", 
-        value: String(postsStats.total || 0), 
-        total_Change: String(Math.abs(postsStats.change || 0)), 
-        icon: <FileText className="h-4 w-4" />, 
+      {
+        title: "Total Blog Posts",
+        value: String(postsStats.total || 0),
+        total_Change: String(Math.abs(postsStats.change || 0)),
+        icon: <FileText className="h-4 w-4" />,
         change: `${postsStats.isPositive ? '+' : '-'}${Math.abs(postsStats.percentChange || 0)}%`,
         path: "/admin/blogs",
         isPositive: postsStats.isPositive
@@ -103,14 +105,22 @@ export default function AdminDashboard() {
 
       <hr className="my-4 border-t" />
 
-      <h1 className="text-3xl font-bold pb-4">Admin Dashboard</h1>
-      
+      <div className="flex justify-between items-center pb-4">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <School className="h-4 w-4" />
+          <span>
+            {userRole === 'admin' ? 'All Schools' : `School: ${userSchool}`}
+          </span>
+        </div>
+      </div>
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           Error loading dashboard data: {error}
         </div>
       )}
-      
+
       <div className="space-y-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -122,13 +132,13 @@ export default function AdminDashboard() {
                     {stat.icon}
                     {!isLoading ? stat.title : <Skeleton className="h-4 w-[120px]" />}
                   </div>
-                  
+
                   {isLoading ? (
                     <Skeleton className="h-8 w-[100px] mb-2" />
                   ) : (
                     <div className="text-2xl font-bold">{stat.value}</div>
                   )}
-                  
+
                   {isLoading ? (
                     <Skeleton className="h-4 w-[80px] mt-2" />
                   ) : (
@@ -137,14 +147,13 @@ export default function AdminDashboard() {
                     </div>
                   )}
                 </div>
-                
+
                 {isLoading ? (
                   <Skeleton className="h-4 w-[60px]" />
                 ) : (
                   <div className="flex flex-col items-end gap-2">
-                    <div className={`flex items-center gap-1 text-sm ${
-                      stat.isPositive ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <div className={`flex items-center gap-1 text-sm ${stat.isPositive ? 'text-green-600' : 'text-red-600'
+                      }`}>
                       {stat.isPositive ? (
                         <ArrowUp className="h-4 w-4" />
                       ) : (
@@ -152,8 +161,8 @@ export default function AdminDashboard() {
                       )}
                       {stat.change}
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       className="mt-2"
                       onClick={() => handleNavigation(stat.path)}
@@ -171,10 +180,17 @@ export default function AdminDashboard() {
         <Card>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">
-                {isLoading ? <Skeleton className="h-6 w-[200px]" /> : 'Recent Blog Posts'}
-              </h2>
-              
+              <div>
+                <h2 className="text-xl font-semibold">
+                  {isLoading ? <Skeleton className="h-6 w-[200px]" /> : 'Recent Blog Posts'}
+                </h2>
+                {!isLoading && userRole !== 'admin' && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Showing posts from your school only
+                  </p>
+                )}
+              </div>
+
               {!isLoading && (
                 <Button
                   variant="outline"
@@ -184,7 +200,7 @@ export default function AdminDashboard() {
                 </Button>
               )}
             </div>
-            
+
             <Table>
               <TableHeader>
                 <TableRow>
@@ -195,7 +211,7 @@ export default function AdminDashboard() {
                   ))}
                 </TableRow>
               </TableHeader>
-              
+
               <TableBody>
                 {isLoading ? (
                   // Skeleton Rows
@@ -217,21 +233,20 @@ export default function AdminDashboard() {
                       <TableCell>{post.tipe_acara}</TableCell>
                       <TableCell>{new Date(post.date).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          post.status === 'published' ? 'bg-green-100 text-green-800' : 
-                          post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className={`px-2 py-1 rounded text-xs ${post.status === 'published' ? 'bg-green-100 text-green-800' :
+                          post.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
                           {post.status}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleNavigation(`/admin/events/${post.id}`)}
                         >
-                          View
+                          <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
                     </TableRow>

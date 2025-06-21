@@ -14,10 +14,10 @@ import { useToast } from "@/hooks/use-toast";
 
 import { columns } from "./tables/column";
 import { DataTable } from "./tables/data-tables";
-import { UserPlus } from "lucide-react"; 
+import { UserPlus } from "lucide-react";
 
 import UserForm from "./formInput";
-import DeleteUserDialog from "./user-crud/deleteUser"; 
+import DeleteUserDialog from "./user-crud/deleteUser";
 
 
 export default function UserAdmin() {
@@ -31,7 +31,7 @@ export default function UserAdmin() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
-  
+
 
   const handleAddUser = () => {
     setCurrentUser(null);
@@ -46,16 +46,16 @@ export default function UserAdmin() {
   const handleDeleteUser = (userId) => {
     const userToDelete = users.find(user => user.id === userId);
     if (!userToDelete) return;
-    
+
     setUserToDelete(userToDelete);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDeleteUser = async () => {
     if (!userToDelete || !token) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`http://localhost:3000/users/${userToDelete.id}`, {
         method: "DELETE",
@@ -70,7 +70,7 @@ export default function UserAdmin() {
       }
 
       setUsers(users.filter(user => user.id !== userToDelete.id));
-      
+
       toast({
         title: "Success",
         description: `User "${userToDelete.full_name}" deleted successfully`,
@@ -124,7 +124,7 @@ export default function UserAdmin() {
       const result = await response.json();
 
       if (currentUser) {
-        setUsers(users.map(user => 
+        setUsers(users.map(user =>
           user.id === currentUser.id ? result : user
         ));
         toast({
@@ -228,17 +228,17 @@ export default function UserAdmin() {
         </div>
 
         <div className="py-6">
-          <DataTable 
-            columns={columns(handleEditUser, handleDeleteUser)} 
-            data={users} 
+          <DataTable
+            columns={columns(handleEditUser, handleDeleteUser)}
+            data={users}
           />
         </div>
       </div>
 
       {/* User Form Dialog */}
-      <UserForm 
-        isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)} 
+      <UserForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
         userData={currentUser}
         onSubmit={handleFormSubmit}
       />

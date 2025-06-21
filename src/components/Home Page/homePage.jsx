@@ -32,7 +32,7 @@ const Homepage = () => {
   const eventsContainerRef = useRef(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Search form states
   const [searchQuery, setSearchQuery] = useState("");
   const [eventType, setEventType] = useState("");
@@ -44,7 +44,18 @@ const Homepage = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:3000/events');
+        // Get token from localStorage if it exists
+        const token = localStorage.getItem('token');
+
+        // Configure axios request with optional auth header
+        const config = token ? {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        } : {};
+
+        const response = await axios.get('http://localhost:3000/events', config);
+
         // Filter published events only and limit to 5 recent events
         const publishedEvents = response.data
           .filter(event => event.status === "published")
@@ -65,7 +76,26 @@ const Homepage = () => {
             thumbnail: "https://via.placeholder.com/300x200",
             status: "published",
           },
-          // ... rest of mock data
+          {
+            id: 20,
+            title: "Festival Seni Budaya",
+            school: "SMAN 1 CIMAHI",
+            event: "Festival",
+            date: "2025-04-15T00:00:00.000Z",
+            content: "<p>Festival Seni Budaya Tingkat Kota Cimahi</p>",
+            thumbnail: "https://via.placeholder.com/300x200",
+            status: "published",
+          },
+          {
+            id: 21,
+            title: "Workshop Coding",
+            school: "SMKN 2 CIMAHI",
+            event: "Workshop",
+            date: "2025-03-20T00:00:00.000Z",
+            content: "<p>Workshop Coding untuk Pemula</p>",
+            thumbnail: "https://via.placeholder.com/300x200",
+            status: "published",
+          }
         ]);
       } finally {
         setLoading(false);
@@ -78,15 +108,15 @@ const Homepage = () => {
   // Handle search form submission
   const handleSearch = (e) => {
     e.preventDefault();
-    
+
     // Create query params object
     const params = new URLSearchParams();
-    
+
     if (searchQuery) params.append("query", searchQuery);
     if (eventType) params.append("eventType", eventType);
     if (institution) params.append("institution", institution);
     if (dateFilter) params.append("dateFilter", dateFilter);
-    
+
     // Navigate to search results page with query params
     navigate(`/search-results?${params.toString()}`);
   };
@@ -139,7 +169,7 @@ const Homepage = () => {
       duration: 1,
       ease: "power2.out",
     });
-  
+
     gsap.to("#card2", {
       scrollTrigger: {
         trigger: "#card2",
@@ -213,7 +243,7 @@ const Homepage = () => {
             backgroundPosition: 'center',
           }}
         />
-        
+
         <div
           id="aula-bg"
           className="absolute inset-0 z-20"
@@ -223,7 +253,7 @@ const Homepage = () => {
             backgroundPosition: 'center',
           }}
         />
-        
+
         <div
           id="daun-bg"
           className="absolute inset-0 z-30"
@@ -257,7 +287,7 @@ const Homepage = () => {
         <div className="container mx-auto text-black">
           <h2 className="text-4xl font-bold mb-6 mt-12 md:mt-8 text-center">Fokus Kami</h2>
           <p className="text-lg max-w-2xl text-center mx-auto">
-            Platform kolaboratif untuk seluruh siswa se-Kota Cimahi. Temukan berbagai 
+            Platform kolaboratif untuk seluruh siswa se-Kota Cimahi. Temukan berbagai
             kegiatan, event, dan program pendidikan terbaru dari berbagai institusi.
           </p>
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -280,16 +310,16 @@ const Homepage = () => {
         {/* Background Box */}
         <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[80%] h-[80%] bg-gradient-to-r from-blue-800 to-indigo-900 rounded-xl -z-10 shadow-2xl">
           {/* Pattern Overlay */}
-          <div className="absolute inset-0 opacity-10" style={{ 
+          <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
             backgroundSize: '20px 20px'
           }}></div>
         </div>
-        
+
         <div className="container mx-auto flex items-center justify-center">
           <div className="w-full max-w-6xl mx-auto py-8 px-4 z-10">
-            <h2 className="text-3xl font-bold mb-6 text-center">Cari Acara Yang Kamu Cari</h2> 
-            
+            <h2 className="text-3xl font-bold mb-6 text-center">Cari Acara Yang Kamu Cari</h2>
+
             <Card className="rounded-lg shadow-xl">
               <CardContent className="p-6">
                 <form onSubmit={handleSearch}>
@@ -367,17 +397,17 @@ const Homepage = () => {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">Acara Terbaru</h2>
             <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={scrollLeft}
                 className="rounded-full h-10 w-10 border-gray-300"
               >
                 <ChevronLeft size={20} />
               </Button>
-              <Button 
-                variant="outline" 
-                size="icon" 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={scrollRight}
                 className="rounded-full h-10 w-10 border-gray-300"
               >
@@ -385,21 +415,21 @@ const Homepage = () => {
               </Button>
             </div>
           </div>
-          
-          <div 
+
+          <div
             ref={eventsContainerRef}
             className="flex overflow-x-auto space-x-6 pb-6 scrollbar-hide"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {events.map((event) => (
-              <Card 
-                key={event.id} 
+              <Card
+                key={event.id}
                 className="event-card flex-shrink-0 w-72 opacity-0 translate-x-10 hover:shadow-lg transition-all duration-300"
               >
                 <div className="relative h-40 rounded-t-lg overflow-hidden">
-                  <img 
-                    src={event.thumbnail || "https://via.placeholder.com/300x200"} 
-                    alt={event.title} 
+                  <img
+                    src={event.thumbnail || "https://via.placeholder.com/300x200"}
+                    alt={event.title}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.src = "https://via.placeholder.com/300x200";
@@ -416,9 +446,9 @@ const Homepage = () => {
                   </div>
                   <h3 className="font-bold text-lg mb-1 line-clamp-2">{event.title}</h3>
                   <p className="text-sm text-gray-500 mb-3">{event.school}</p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
                     onClick={() => navigate(`/blog/${event.id}`)}
                   >

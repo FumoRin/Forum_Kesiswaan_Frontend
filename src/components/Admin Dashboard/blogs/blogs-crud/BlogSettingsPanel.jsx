@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,11 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Calendar, School, Award, ImageIcon } from 'lucide-react';
+import { useAuth } from "@/components/utils/authProvider";
 
 const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleDateSelect, handleChange, handleThumbnailChange }) => {
+  const { userRole, userSchool } = useAuth();
+
   // Helper to get the thumbnail source URL
   const getThumbnailSrc = () => {
     if (!formData.thumbnail) return null;
@@ -26,6 +29,13 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
   };
 
   const thumbnailSrc = getThumbnailSrc();
+
+  // Set school value based on user role when component mounts or when formData changes
+  useEffect(() => {
+    if (userRole === "user" && (!formData.school || formData.school === "")) {
+      handleChange({ target: { id: "school", value: userSchool } });
+    }
+  }, [userRole, userSchool, formData.school]);
 
   return (
     <div className="space-y-6">
@@ -65,9 +75,8 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`w-full justify-start text-left font-normal bg-white ${
-                      !selectedDate && "text-muted-foreground"
-                    }`}
+                    className={`w-full justify-start text-left font-normal bg-white ${!selectedDate && "text-muted-foreground"
+                      }`}
                   >
                     <Calendar className="mr-2 h-4 w-4" />
                     {selectedDate ? (
@@ -107,11 +116,12 @@ const BlogSettingsPanel = ({ formData, selectedDate, handleSelectChange, handleD
               <Input
                 id="school"
                 name="school"
-                value={formData.school}
+                value={formData.school || (userRole === "user" ? userSchool : "")}
                 onChange={handleChange}
                 placeholder="Enter school name"
                 required
                 className="bg-white"
+                disabled={userRole === "user"}
               />
             </div>
 

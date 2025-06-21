@@ -11,10 +11,10 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import TextAlign from '@tiptap/extension-text-align';
-import { 
-  Bold, Italic, Underline as UnderlineIcon, Heading2, Heading3, 
-  List, ListOrdered, Link as LinkIcon, Image as ImageIcon, 
-  AlignLeft, AlignCenter, AlignRight, Undo, Redo, 
+import {
+  Bold, Italic, Underline as UnderlineIcon, Heading2, Heading3,
+  List, ListOrdered, Link as LinkIcon, Image as ImageIcon,
+  AlignLeft, AlignCenter, AlignRight, Undo, Redo,
   Calendar, School, Award, LayoutGrid, ArrowLeft
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -39,11 +39,12 @@ import { toast } from "@/hooks/use-toast";
 const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
   const navigate = useNavigate();
   const isEditMode = mode === 'edit';
-  
+  const { userRole, userSchool } = useAuth();
+
   const [formData, setFormData] = useState({
     id: blog?.id || '',
     title: blog?.title || '',
-    school: blog?.school || '',
+    school: blog?.school || (userRole === 'user' ? userSchool : ''),
     event: blog?.event || '',
     date: blog?.date || '',
     content: blog?.content || '',
@@ -51,7 +52,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     gallery: blog?.gallery || [],
     thumbnail: blog?.thumbnail || null,
   });
-  
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [activeTab, setActiveTab] = useState("content");
   const [previewContent, setPreviewContent] = useState('');
@@ -62,15 +63,25 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     if (onSubmit) {
       onSubmit(responseData);
     }
-    
+
     toast({
       title: "Success",
-      description: formData.status === 'published' 
-        ? "Blog published successfully." 
+      description: formData.status === 'published'
+        ? "Blog published successfully."
         : "Blog saved as draft.",
       variant: "success",
     });
   });
+
+  // Set school field when component mounts or when userRole/userSchool changes
+  useEffect(() => {
+    if (userRole === 'user' && !formData.school) {
+      setFormData(prev => ({
+        ...prev,
+        school: userSchool
+      }));
+    }
+  }, [userRole, userSchool]);
 
   const editor = useEditor({
     extensions: [
@@ -117,7 +128,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
 
       let formattedDate = blog?.date || '';
       let dateObj = null;
-      
+
       if (formattedDate) {
         // Try to detect the date format and convert appropriately
         if (/^\d{4}-\d{2}-\d{2}/.test(formattedDate)) {
@@ -156,9 +167,9 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
           }
         }
       }
-      
+
       setSelectedDate(dateObj);
-      
+
       setFormData({
         id: blog?.id || '',
         title: blog?.title || '',
@@ -190,7 +201,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
           if (!isNaN(day) && month !== undefined && !isNaN(year)) {
             const dateObj = new Date(year, month, day);
             if (!selectedDate || dateObj.getTime() !== selectedDate.getTime()) {
-                setSelectedDate(dateObj);
+              setSelectedDate(dateObj);
             }
           }
         }
@@ -199,7 +210,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
         setSelectedDate(null);
       }
     } else {
-        setSelectedDate(null);
+      setSelectedDate(null);
     }
   }, [formData.date]);
 
@@ -228,11 +239,11 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
     const formattedDate = `${day} ${month} ${year}`;
-    
+
     // Also store ISO date format to ensure correct data submission
     const isoDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
-    setFormData(prev => ({ 
-      ...prev, 
+    setFormData(prev => ({
+      ...prev,
       date: formattedDate,
       dateISO: isoDate
     }));
@@ -272,8 +283,8 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
         URL.revokeObjectURL(itemToRemove.original);
       }
       return {
-          ...prev,
-          gallery: prev.gallery.filter((_, i) => i !== index)
+        ...prev,
+        gallery: prev.gallery.filter((_, i) => i !== index)
       };
     });
   };
@@ -293,7 +304,15 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
-    
+
+    // Ensure school is set for regular users
+    if (userRole === 'user') {
+      setFormData(prev => ({
+        ...prev,
+        school: userSchool
+      }));
+    }
+
     if (!formData.title || !formData.content) {
       toast({
         title: "Validation Error",
@@ -302,7 +321,7 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       });
       return;
     }
-    
+
     if (!formData.dateISO && !formData.date) {
       toast({
         title: "Validation Error",
@@ -311,15 +330,14 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
       });
       return;
     }
-    
+
     try {
-      // Simply pass the formData - all images are already uploaded at this point
       await handleSubmit(formData);
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (err) {
+      console.error("Error submitting form:", err);
       toast({
         title: "Error",
-        description: error.message || "There was a problem saving your blog.",
+        description: err.message || "Failed to submit blog post",
         variant: "destructive",
       });
     }
@@ -341,9 +359,9 @@ const BlogForm = ({ blog, onSubmit, onCancel, mode = 'add' }) => {
 
   return (
     <div className="md:px-6">
-      <form 
-        id="blog-form" 
-        onSubmit={handleFormSubmission} 
+      <form
+        id="blog-form"
+        onSubmit={handleFormSubmission}
         className="space-y-6"
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
