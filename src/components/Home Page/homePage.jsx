@@ -17,6 +17,8 @@ import { Search, Calendar, Building, Tag, ChevronRight, ChevronLeft } from "luci
 import langit from "../../assets/Langit.png";
 import aula from "../../assets/Aula.png";
 import daun from "../../assets/Daun.png";
+import event1 from "../../assets/event1.jpg";
+import event2 from "../../assets/event2.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -262,11 +264,12 @@ const Homepage = () => {
             <div className="card p-6 rounded-lg shadow-lg bg-gray-100 opacity-0 translate-y-10 hover:border-2 hover:border-[#DF2E38] transition-all duration-300" id="card1">
               <h3 className="text-xl font-semibold mb-2">Event Siswa</h3>
               <p>Ikuti berbagai event menarik seperti seminar, workshop, dan lomba antar sekolah.</p>
-              <img src="/images/event.jpg" alt="Event Siswa" className="w-full h-48 object-cover rounded-md mb-4" />
+              <img src={event2} alt="Event Siswa" className="w-full h-64 mt-4 object-cover rounded-md mb-4" />
             </div>
             <div className="card p-6 rounded-lg shadow-lg bg-gray-100 opacity-0 translate-y-10 hover:border-2 hover:border-[#DF2E38] transition-all duration-300" id="card2">
               <h3 className="text-xl font-semibold mb-2">Program Pendidikan</h3>
               <p>Dapatkan informasi tentang beasiswa, pelatihan, dan program studi lanjut.</p>
+              <img src={event1} alt="Program Pendidikan" className="w-full h-64 mt-4 object-cover rounded-md mb-4" />
             </div>
           </div>
         </div>

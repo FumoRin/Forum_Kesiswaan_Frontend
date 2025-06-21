@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import logo from "../assets/logo.svg";
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +11,30 @@ const Navbar = () => {
   const isAdminRoute = location.pathname.startsWith("/admin");
   const { isAuthenticated, logout, userRole } = useAuth();
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleDropdown = () => {
     setShowSidebar(!showSidebar);
@@ -21,7 +45,9 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#2A2828]/50 backdrop-blur-md p-4 flex justify-between items-center">
+    <nav className={`fixed top-0 left-0 right-0 z-50 bg-[#2A2828]/50 backdrop-blur-md p-4 flex justify-between items-center transition-transform duration-300 ${
+      isVisible ? 'translate-y-0' : '-translate-y-full'
+    }`}>
       {/* Logo Section */}
       <Link to="/">
         <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
@@ -147,16 +173,17 @@ const Navbar = () => {
       </div>
 
       {/* Sidebar Overlay */}
-      {showSidebar && (
-        <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-0"
-          onClick={toggleDropdown}
-        />
-      )}
+      <div
+        className={`fixed inset-0 z-[100] bg-black transition-all duration-300 ${
+          showSidebar ? 'opacity-50' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={toggleDropdown}
+        style={{ height: '100vh', width: '100vw' }}
+      />
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 z-50 h-full w-64 bg-[#2A2828] text-white transform ${
+        className={`fixed top-0 right-0 z-[101] h-full w-64 bg-[#2A2828] text-white transform ${
           showSidebar ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out md:hidden`}
       >
@@ -179,61 +206,65 @@ const Navbar = () => {
           </button>
         </div>
 
-        <div className="flex flex-col space-y-4 p-4 bg-[#2A2828] h-screen items-center gap-6 text-xl font-semibold">
-          {!isAdminRoute ? (
-            <>
-              <Link to="/" onClick={toggleDropdown}>
-                Home
-              </Link>
-              <Link to="/search-results" onClick={toggleDropdown}>
-                Pencarian
-              </Link>
-              <Link to="/about" onClick={toggleDropdown}>
-                Tentang Kami
-              </Link>
-              {userRole === "admin" && (
+        <div className="flex flex-col justify-between h-[calc(100vh-80px)] p-4 bg-[#2A2828]">
+          <div className="flex flex-col space-y-4 items-center gap-6 text-xl font-semibold">
+            {!isAdminRoute ? (
+              <>
+                <Link to="/" onClick={toggleDropdown}>
+                  Home
+                </Link>
+                <Link to="/search-results" onClick={toggleDropdown}>
+                  Pencarian
+                </Link>
+                <Link to="/about" onClick={toggleDropdown}>
+                  Tentang Kami
+                </Link>
+                {userRole === "admin" && (
+                  <Link to="/admin" onClick={toggleDropdown}>
+                    Dashboard
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
                 <Link to="/admin" onClick={toggleDropdown}>
                   Dashboard
                 </Link>
-              )}
-            </>
-          ) : (
-            <>
-              <Link to="/admin" onClick={toggleDropdown}>
-                Dashboard
-              </Link>
-              <Link to="/admin/users" onClick={toggleDropdown}>
-                Users
-              </Link>
-              <Link to="/admin/blogs" onClick={toggleDropdown}>
-                Blogs
-              </Link>
-              <Link to="/" onClick={toggleDropdown}>
-                Homepage
-              </Link>
-            </>
-          )}
+                <Link to="/admin/users" onClick={toggleDropdown}>
+                  Users
+                </Link>
+                <Link to="/admin/blogs" onClick={toggleDropdown}>
+                  Blogs
+                </Link>
+                <Link to="/" onClick={toggleDropdown}>
+                  Homepage
+                </Link>
+              </>
+            )}
+          </div>
 
-          {isAuthenticated ? (
-            <button
-              onClick={() => {
-                handleLogout();
-                toggleDropdown();
-              }}
-              className="bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
-            >
-              Logout
-            </button>
-          ) : (
-            <Link
-              to="/auth"
-              state={{ tab: "login" }}
-             className="bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
-              onClick={toggleDropdown}
-            >
-              Login
-            </Link>
-          )}
+          <div className="mt-auto pb-8">
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  toggleDropdown();
+                }}
+                className="w-full bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                state={{ tab: "login" }}
+                className="block w-full text-center bg-[#DF2E38] text-[#DDD8D6] rounded-xl px-4 py-2"
+                onClick={toggleDropdown}
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
